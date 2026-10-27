@@ -7,7 +7,7 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 
 ## Project status
 
-- **Current stage:** Step 6 in progress — all 11 unit tests pass, and the continuous-only implementation matches scikit-learn GaussianNB within the configured tolerance. The full hybrid model's held-out evaluation script is committed; local execution and result review are pending.
+- **Current stage:** Step 7 in progress — Step 5 numerical validation and Step 6 held-out evaluation have passed in the user's environment. The sequential Bayesian posterior-trace method, demo script, and tests are committed; local verification of Step 7 is pending.
 - **Dataset selected:** UCI Heart Disease, Cleveland subset.
 - **Implementation status:** Dataset EDA, distribution diagnostics, and a from-scratch hybrid Naive Bayes classifier are present. The classifier uses Gaussian likelihoods for continuous features and Laplace-smoothed categorical likelihoods for discrete-coded features.
 - **Repository audit:** The repository was empty when inspected. The README, dataset, EDA script, and Step 2 report now establish the project baseline; no existing project files were overwritten or removed.
@@ -19,8 +19,8 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 3. Fit and diagnose per-class feature distributions. Assess Gaussian assumptions with histograms, Q-Q plots, and Shapiro-Wilk tests where appropriate; consider log-normal or KDE alternatives when justified. Use Bernoulli/categorical probabilities with Laplace smoothing for discrete features.
 4. Implement Naive Bayes from scratch in NumPy using class priors, Gaussian continuous-feature likelihoods, Laplace-smoothed categorical likelihoods, and normalized log-space posteriors. (Implemented; see `bayespulse/naive_bayes.py`.)
 5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies. (Verified: 11 unit tests pass; priors and predictions match; maximum parameter difference 2.842e-13 and maximum held-out probability difference 3.109e-15.)
-6. Evaluate on a proper held-out split using confusion matrix, precision, recall, F1, ROC-AUC, Brier score, and a calibration curve. (Script committed; local run pending.)
-7. Add a feature-by-feature Bayesian updating demonstration.
+6. Evaluate on a proper held-out split using confusion matrix, precision, recall, F1, ROC-AUC, Brier score, and a calibration curve. (Verified on one 76-row held-out split; results in `reports/step6_evaluation.md`.)
+7. Add a feature-by-feature Bayesian updating demonstration. (Implemented in `predict_proba_progression` and `scripts/bayesian_updating_demo.py`; local verification pending.)
 8. Add interpretable per-feature log-likelihood ratios.
 9. Add bootstrap uncertainty intervals, cost-sensitive thresholds, and feature-dependence/model comparison analysis where feasible.
 10. Build a Streamlit demo with input validation, risk estimates, contribution breakdowns, distribution context, and a visible disclaimer.
@@ -87,6 +87,7 @@ python scripts/explore_dataset.py
 python scripts/fit_distributions.py
 python scripts/validate_against_sklearn.py
 python scripts/evaluate_model.py
+python scripts/bayesian_updating_demo.py
 ```
 
 The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBayes`. It accepts a numeric 2D NumPy array; represent missing feature values as `numpy.nan`, and pass continuous and categorical column indices explicitly. Fit all model parameters on training data only. The Step 4 unit tests cover priors, posterior normalization, separated synthetic classes, missing features, unseen categories, constant features, invalid inputs, single-class/missing-label rejection, and prediction-before-fit. The user reran the suite after the fix: all 11 tests passed. The GaussianNB comparison also passed: class priors and held-out predictions matched; maximum fitted mean/variance difference was 2.842e-13 and maximum held-out probability difference was 3.109e-15.
@@ -124,3 +125,12 @@ The complete file inventory, dependency review, user-run results, prediction-bef
 ## Step 6: held-out evaluation
 
 Run `python scripts/evaluate_model.py` from the repository root. It evaluates all 13 predictors on a stratified 75/25 split (seed 42), fits only on training rows, and reports accuracy, class-1 precision/recall/F1, ROC-AUC, Brier score, a confusion matrix, and calibration bins. It writes a Markdown result report and three plots under `reports/evaluation/`; generated outputs are ignored by Git. Runtime metrics are not claimed until the script is run locally and reviewed. See [`reports/step6_evaluation.md`](reports/step6_evaluation.md).
+
+
+## Step 6: held-out evaluation results
+
+The user ran the 11-test suite successfully and executed `scripts/evaluate_model.py` on a stratified 75/25 split (227 training rows, 76 held-out rows, seed 42). The held-out results were accuracy 0.8816, class-1 precision 0.8250, recall 0.9429, F1 0.8800, ROC-AUC 0.9742, and Brier score 0.0798. The confusion matrix was `[[34, 7], [2, 33]]`. These are preliminary single-split results, not clinical validation; the calibration bins suggest possible overconfidence in a high-probability range. Full details and caveats are in [`reports/step6_evaluation.md`](reports/step6_evaluation.md).
+
+## Step 7: sequential Bayesian updating
+
+`HybridNaiveBayes.predict_proba_progression(X)` returns posterior probabilities starting with class priors and updating after each feature. Run `python scripts/bayesian_updating_demo.py` to trace one deterministic held-out sample. The method, demo, and added tests are committed; the user must run the unit suite and demo before Step 7 is marked complete. See [`reports/step7_bayesian_updating.md`](reports/step7_bayesian_updating.md).
