@@ -29,13 +29,18 @@ The user's Step 4 terminal output shows that dependency installation found all d
 
 The same output reports **9 unit tests run, 1 error**: `test_predict_before_fit_is_rejected` raised `AttributeError` because `predict()` accessed `classes_` before the fitted-state check in `predict_log_proba()`. This was a genuine bug. `predict()` now checks the fitted state first and raises `RuntimeError("Call fit before predict.")`; the test now checks for that clear error.
 
+## Windows import-path fix
+
+The user ran the unit suite from the repository root on Windows: all 11 tests passed. The subsequent comparison command failed before fitting either model because executing a script inside `scripts/` did not put the repository root on Python's import path (`ModuleNotFoundError: No module named 'bayespulse'`). The script now inserts its own repository root into `sys.path` before importing the project package, making the documented root-level command self-contained. This is a path/bootstrap fix, not a model result.
+
 ## Verification status and remaining checks
 
 - User-confirmed: package installation succeeded; EDA and distribution diagnostics ran successfully.
 - User-confirmed failure: 1 of 9 Step 4 tests errored before the fix.
 - Fix committed: explicit fitted-state guard in `predict()`; matching test assertion updated.
 - Not yet confirmed: rerun of the unit suite after the fix.
-- Not yet confirmed: runtime output of `scripts/validate_against_sklearn.py`. The comparison script is committed, but its numeric results must not be claimed until run.
+- Confirmed: all 11 unit tests pass after the fitted-state guard fix.
+- Not yet confirmed: runtime output of `scripts/validate_against_sklearn.py` after the import-path fix. The comparison must be rerun; numeric parity is not yet claimed.
 - A clean clone was not independently run by the assistant environment.
 
 ## Interpretation guardrails
