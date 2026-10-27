@@ -24,19 +24,28 @@ The total posterior log-odds equal the prior term plus the sum of feature contri
 - Added `scripts/feature_contributions_demo.py`, which uses the same deterministic stratified split as the evaluation script and prints the held-out sample's per-feature contributions.
 - Added tests for reconstruction of posterior log-odds, missing values, reversing the selected positive class, and invalid model/class configurations.
 
-## Run
+## Verification
 
-From the repository root:
+**Passed locally on 2026-10-28.**
+
+Command:
 
 ```powershell
-git pull origin main
 python -m unittest discover -s tests -v
 python scripts/feature_contributions_demo.py
 ```
 
-## Verification status
+Results:
+- Unit tests: **20 passed**, 0 failures/errors, in 0.047 seconds.
+- Demo completed on the deterministic split: 227 training rows and 76 held-out rows.
+- Selected held-out row index: 256.
+- Prior log-odds for class 1: `-0.167793`.
+- Sum of prior and feature contributions (total log-odds): `-1.645294`.
+- Posterior probability for class 1: `0.161746`.
+- Predicted class: `0`; retrospective dataset label: `0`.
+- GitHub Actions workflow passed for commit `f19b051912807aa03678677e15fce8871a65ef89`, including the automated verification gate.
 
-**Pending local verification.** The last user-confirmed run passed the previous 16-test suite and all existing scripts before Step 8 was added. The new suite is expected to contain 20 tests. Do not mark Step 8 complete until the new suite passes and the demo output is reviewed.
+The contribution sum agrees with the reported posterior: applying the logistic transformation to the total log-odds gives the same class-1 probability (up to displayed rounding).
 
 ## Interpretation limits
 
