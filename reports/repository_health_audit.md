@@ -6,9 +6,9 @@
 
 ## Executive result
 
-- **Step 8 passed:** the user ran 20 tests and the feature-contribution demo; the contribution sum reconstructed the posterior log-odds.
-- **Step 9 passed:** the user ran 24 tests, the GaussianNB equivalence comparison printed PASS, and the uncertainty/QDA analysis completed. GitHub Actions also passed for the Step 9 commit series.
-- **Step 10 is implemented but awaiting browser verification:** `app.py` provides an educational Streamlit UI. The user must still run it locally and check the visible controls and outputs.
+- **Step 8 passed:** the user ran 20 tests and the feature-contribution demo; the contribution sum reconstructed posterior log-odds.
+- **Step 9 passed:** the user ran 24 tests, the GaussianNB equivalence comparison printed PASS, and the uncertainty/QDA analysis completed. GitHub Actions passed for the Step 9 commit series.
+- **Step 10 is implemented but awaiting local verification:** `app.py` provides an educational Streamlit UI. A new integration smoke test checks dataset loading, predictions, evidence output, and posterior reconstruction. The updated 25-test suite and browser UI still require local verification.
 
 ## Previously identified defects and fixes
 
@@ -34,11 +34,11 @@ These results are conditional on one small fixed split and are not clinical vali
 
 ## Step 10 implementation review
 
-- `app.py` uses the existing estimator and exposes continuous inputs, categorical-coded dropdowns, optional missing predictors, posterior probabilities, per-feature log-likelihood ratios, and a Bayesian updating trace.
+- `app.py` exposes continuous inputs, categorical-coded dropdowns, optional missing predictors, posterior probabilities, per-feature log-likelihood ratios, and a Bayesian updating trace.
 - The app trains on the full 303-row dataset for interactive demonstration. Its output is not a held-out prediction; this is stated in the UI and README.
 - The UI warns users not to enter real patient information and not to use results for diagnosis or patient care.
-- The workflow now includes `python -m py_compile app.py`.
-- Local browser launch and interaction are still unverified. A syntax check alone cannot establish the UI runs correctly.
+- The workflow checks `python -m py_compile app.py`; the new integration smoke test exercises the data/model interface and checks that feature contributions reconstruct posterior log-odds.
+- Local browser launch and interaction are still unverified. Automated checks do not fully substitute for checking the UI in a browser.
 
 ## Remaining repository gaps
 
@@ -62,4 +62,4 @@ In the browser, confirm that the page loads, the inputs can be changed, the demo
 
 ## Current conclusion
 
-Steps 8 and 9 are verified. Step 10's implementation is committed but must not be marked complete until the local Streamlit UI is tested. The next step is to review the user's run output, fix any issues, update the README/report, and verify the latest GitHub Actions result.
+Steps 8 and 9 are verified. Step 10 is implemented but remains pending the 25-test suite and manual Streamlit browser check. Review the user's output, fix any failures, update the README/report, and verify the latest GitHub Actions result before closing Step 10.
