@@ -38,9 +38,9 @@ The user ran the unit suite from the repository root on Windows: all 11 tests pa
 - User-confirmed: package installation succeeded; EDA and distribution diagnostics ran successfully.
 - User-confirmed failure: 1 of 9 Step 4 tests errored before the fix.
 - Fix committed: explicit fitted-state guard in `predict()`; matching test assertion updated.
-- Not yet confirmed: rerun of the unit suite after the fix.
+- Confirmed by the user's later run: the post-fix unit suite passes all 11 tests.
 - Confirmed: all 11 unit tests pass after the fitted-state guard fix.
-- Not yet confirmed: runtime output of `scripts/validate_against_sklearn.py` after the import-path fix. The comparison must be rerun; numeric parity is not yet claimed.
+- Confirmed by the user's later run: class priors match; maximum fitted mean/variance difference is 2.842e-13; maximum held-out probability difference is 3.109e-15; held-out predictions match; the script reports PASS.
 - A clean clone was not independently run by the assistant environment.
 
 ## Interpretation guardrails
@@ -48,4 +48,4 @@ The user ran the unit suite from the repository root on Windows: all 11 tests pa
 - Agreement with GaussianNB on continuous features checks that the NumPy Gaussian calculations align with a trusted implementation when assumptions match.
 - It does not validate the hybrid categorical component against GaussianNB, establish that Gaussian likelihoods are the best fit for every feature, or demonstrate clinical utility.
 - Feature distributions and all model parameters must be fitted on training data only for any evaluation.
-- Step 6 remains responsible for a broader held-out performance evaluation and calibration analysis.
+- Step 6 now implements a broader hybrid-model held-out evaluation and calibration analysis in `scripts/evaluate_model.py`; see `reports/step6_evaluation.md`. Its local runtime results remain pending.
