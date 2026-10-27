@@ -54,3 +54,16 @@ jobs:
 
       - name: Run uncertainty, decision, and dependence analysis
         run: python scripts/uncertainty_decision_analysis.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build React frontend
+        working-directory: frontend
+        run: npm run build
