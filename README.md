@@ -87,7 +87,7 @@ python scripts/explore_dataset.py
 python scripts/fit_distributions.py
 ```
 
-The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBayes`. It accepts a numeric 2D NumPy array; represent missing feature values as `numpy.nan`, and pass continuous and categorical column indices explicitly. Fit all model parameters on training data only. The Step 4 unit tests cover priors, posterior normalization, separated synthetic classes, missing features, unseen categories, constant features, invalid inputs, and prediction-before-fit. **The tests have been added but have not yet been executed in a clean local clone**, so passing runtime status is not claimed.
+The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBayes`. It accepts a numeric 2D NumPy array; represent missing feature values as `numpy.nan`, and pass continuous and categorical column indices explicitly. Fit all model parameters on training data only. The Step 4 unit tests cover priors, posterior normalization, separated synthetic classes, missing features, unseen categories, constant features, invalid inputs, single-class/missing-label rejection, and prediction-before-fit. **The tests have been added but have not yet been executed in a clean local clone**, so passing runtime status is not claimed.
 
 ## Decisions and open questions
 
