@@ -49,7 +49,7 @@ Then verify the UI manually:
 
 ## Verification status
 
-**Verified locally on 2026-10-28.** The user pulled `0e4538f`, ran `python -m py_compile app.py` successfully, and ran `python -m unittest discover -s tests -v`: all **25 tests passed** in 0.445 seconds with no failures or errors. `streamlit run app.py` started and served the app at `http://localhost:8501`; the user reported that the UI looked fine. Streamlit emitted two non-fatal deprecation warnings for `use_container_width`, recommending `width="stretch"` when the current value is `True`. These warnings did not prevent launch or test success. The latest GitHub Actions run status has not been independently confirmed in this audit.
+**Original-environment verification passed on 2026-10-28.** The user ran `python -m py_compile app.py`, all **25 tests passed**, Streamlit started at `http://localhost:8501`, and the user reported that the UI looked fine. Streamlit emitted non-fatal deprecation warnings for `use_container_width`. A subsequent fresh-clone test with newer dependencies passed 24 tests but errored in `tests/test_streamlit_app.py`: the test attempted to mutate a read-only NumPy array. The test setup now calls `.copy()` on the constructed row before assigning categorical modes. Fresh-clone verification after this fix is still pending. This is a test-setup compatibility issue, not evidence of a failure in the classifier itself.
 
 ## Safety and interpretation limits
 
