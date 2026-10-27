@@ -7,7 +7,7 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 
 ## Project status
 
-- **Current stage:** Step 4 complete — NumPy-only hybrid Naive Bayes implementation and unit tests added; runtime verification status is recorded below.
+- **Current stage:** Step 5 in progress — GaussianNB comparison harness added; user-provided runtime output exposed and led to a fix for prediction-before-fit handling. Rerun checks are pending.
 - **Dataset selected:** UCI Heart Disease, Cleveland subset.
 - **Implementation status:** Dataset EDA, distribution diagnostics, and a from-scratch hybrid Naive Bayes classifier are present. The classifier uses Gaussian likelihoods for continuous features and Laplace-smoothed categorical likelihoods for discrete-coded features.
 - **Repository audit:** The repository was empty when inspected. The README, dataset, EDA script, and Step 2 report now establish the project baseline; no existing project files were overwritten or removed.
@@ -18,7 +18,7 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 2. Explore data quality, class balance, feature types, and summary statistics.
 3. Fit and diagnose per-class feature distributions. Assess Gaussian assumptions with histograms, Q-Q plots, and Shapiro-Wilk tests where appropriate; consider log-normal or KDE alternatives when justified. Use Bernoulli/categorical probabilities with Laplace smoothing for discrete features.
 4. Implement Naive Bayes from scratch in NumPy using class priors, Gaussian continuous-feature likelihoods, Laplace-smoothed categorical likelihoods, and normalized log-space posteriors. (Implemented; see `bayespulse/naive_bayes.py`.)
-5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies.
+5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies. (Comparison harness added; execution result pending.)
 6. Evaluate on a proper held-out split or cross-validation using confusion matrix, precision, recall, F1, ROC-AUC, and a calibration curve.
 7. Add a feature-by-feature Bayesian updating demonstration.
 8. Add interpretable per-feature log-likelihood ratios.
@@ -85,9 +85,10 @@ pip install -r requirements.txt
 python -m unittest discover -s tests -v
 python scripts/explore_dataset.py
 python scripts/fit_distributions.py
+python scripts/validate_against_sklearn.py
 ```
 
-The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBayes`. It accepts a numeric 2D NumPy array; represent missing feature values as `numpy.nan`, and pass continuous and categorical column indices explicitly. Fit all model parameters on training data only. The Step 4 unit tests cover priors, posterior normalization, separated synthetic classes, missing features, unseen categories, constant features, invalid inputs, single-class/missing-label rejection, and prediction-before-fit. **The tests have been added but have not yet been executed in a clean local clone**, so passing runtime status is not claimed.
+The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBayes`. It accepts a numeric 2D NumPy array; represent missing feature values as `numpy.nan`, and pass continuous and categorical column indices explicitly. Fit all model parameters on training data only. The Step 4 unit tests cover priors, posterior normalization, separated synthetic classes, missing features, unseen categories, constant features, invalid inputs, single-class/missing-label rejection, and prediction-before-fit. The user ran the suite and reported 9 tests with 1 error: `predict()` raised `AttributeError` before the fitted-state check. This has been fixed to raise a clear `RuntimeError`, and the test now asserts that message. **The suite must be rerun after the fix before it can be marked passing.**
 
 ## Decisions and open questions
 
@@ -107,3 +108,8 @@ The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBa
 ## Step 4 repository health audit
 
 The file inventory, known issues, fixes, and remaining verification limits are recorded in [`reports/step4_repo_audit.md`](reports/step4_repo_audit.md). A local logic-level smoke test passed for core synthetic cases, but the committed test suite and data scripts have not been executed in a clean clone because direct GitHub cloning is unavailable in this environment. Run the commands in the audit report locally before treating the project as runtime-verified.
+
+
+## Step 5: implementation validation
+
+The user-provided output confirms dependency installation was already satisfied and both EDA/distribution scripts completed. It also exposed the prediction-before-fit bug described above. The fix is committed. The GaussianNB comparison harness is available at [`scripts/validate_against_sklearn.py`](scripts/validate_against_sklearn.py); run it alongside the unit suite after pulling the latest `main`. Step 5's actual comparison values and post-fix test status remain pending. See [`reports/step5_validation.md`](reports/step5_validation.md) and [`reports/step4_repo_audit.md`](reports/step4_repo_audit.md).
