@@ -25,6 +25,10 @@ git pull origin main
 python scripts/evaluate_model.py
 ```
 
+## Historical results from the pre-audit implementation
+
+**These values are retained as historical evidence, not as the current implementation's results.** The repository health audit changed categorical smoothing by adding an explicit smoothed `OTHER` bucket for unseen category codes. This can change posterior probabilities and held-out metrics. Re-run `python scripts/evaluate_model.py` after pulling the audit fixes, then replace this section with the new user-confirmed output.
+
 ## User-confirmed results
 
 The user ran `python scripts/evaluate_model.py` locally after the 11-test suite passed.
@@ -69,6 +73,6 @@ The reported metrics are one-split exploratory results, not a clinical claim. Be
 - Naive Bayes assumes conditional independence given the class; correlated predictors can violate this assumption.
 - This dataset and evaluation are educational only. They do not establish clinical validity, safe thresholds, or suitability for patient care.
 
-## Step 6 completion gate
+## Current verification gate
 
-Step 6 runtime checks passed: the user's 11-test suite passed and the evaluation script completed. The results above are recorded. Step 7 can proceed with the sequential Bayesian updating demonstration.
+The original evaluation run completed successfully, but it predates the repository health fixes. The updated evaluation script must be rerun before these metrics can be treated as results for the current model.
