@@ -48,3 +48,6 @@ jobs:
 
       - name: Run feature contribution demo
         run: python scripts/feature_contributions_demo.py
+
+      - name: Run uncertainty, decision, and dependence analysis
+        run: python scripts/uncertainty_decision_analysis.py
