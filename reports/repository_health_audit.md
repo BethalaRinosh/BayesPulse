@@ -8,7 +8,7 @@
 
 - **Step 8 passed:** the user ran 20 tests and the feature-contribution demo; the contribution sum reconstructed posterior log-odds.
 - **Step 9 passed:** the user ran 24 tests, the GaussianNB equivalence comparison printed PASS, and the uncertainty/QDA analysis completed. GitHub Actions passed for the Step 9 commit series.
-- **Step 10 passed in the original local environment:** `app.py` compiled, all 25 tests passed, Streamlit launched, and the user reported that the UI looked fine. A subsequent fresh-clone run installed newer dependency versions and exposed a read-only NumPy array in the integration test setup. The test row now uses `.copy()` before mutating categorical values. The fresh-clone suite must be rerun to verify the fix. The user's Streamlit version also emitted non-fatal `use_container_width` deprecation warnings.
+- **Step 10 and clean-clone verification passed:** `app.py` compiled, all 25 tests passed in the original environment, and Streamlit launched with the user confirming the UI looked fine. A fresh clone with newer dependency versions initially exposed a read-only NumPy array in test setup. The test row now uses `.copy()` before mutation, and the user reran the clean-clone checks successfully: `py_compile` passed and all 25 tests passed in 0.553 seconds. Non-fatal Streamlit cache/script-context warnings appeared in bare test mode; the user's app run also emitted a `use_container_width` deprecation warning.
 
 ## Previously identified defects and fixes
 
