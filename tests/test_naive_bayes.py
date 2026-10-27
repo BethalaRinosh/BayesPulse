@@ -55,6 +55,14 @@ class TestHybridNaiveBayes(unittest.TestCase):
         with self.assertRaises(ValueError):
             HybridNaiveBayes((0,), (1,)).fit(np.array([[1.0, np.inf]]), np.array([0]))
 
+    def test_single_class_training_data_is_rejected(self):
+        with self.assertRaises(ValueError):
+            HybridNaiveBayes((0,), (1,)).fit(np.array([[1.0, 0.0], [2.0, 1.0]]), np.array([0, 0]))
+
+    def test_missing_target_label_is_rejected(self):
+        with self.assertRaises(ValueError):
+            HybridNaiveBayes((0,), (1,)).fit(np.array([[1.0, 0.0], [2.0, 1.0]]), np.array([0.0, np.nan]))
+
     def test_predict_before_fit_is_rejected(self):
         model = HybridNaiveBayes((0,), (1,))
         with self.assertRaises(RuntimeError):
