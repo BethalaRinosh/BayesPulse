@@ -8,10 +8,11 @@ BayesPulse is an educational Probability & Statistics project that implements a 
 
 ## Current status
 
-- The NumPy hybrid Naive Bayes classifier, dataset diagnostics, GaussianNB equivalence check, held-out evaluation, and sequential Bayesian updating demo are implemented.
-- **Repository health verification passed locally:** 16 unit tests passed, the GaussianNB equivalence check passed, and all analysis/evaluation/demo scripts completed successfully after the audit fixes. See `reports/repository_health_audit.md`.
-- Step 8 is in progress: per-feature log-likelihood ratios are implemented with tests and a demo script, but the new Step 8 tests/demo have not yet been run locally.
-- There is no Streamlit app yet. A GitHub Actions verification workflow has been committed, but its first successful run remains unconfirmed. The repository has no declared license for the project source code; the dataset's license does not automatically license the code.
+- The NumPy hybrid Naive Bayes classifier, dataset diagnostics, GaussianNB equivalence check, held-out evaluation, sequential Bayesian updating, and per-feature log-odds explanation are implemented.
+- **Step 8 verification passed locally:** all 20 unit tests passed, and `scripts/feature_contributions_demo.py` completed successfully. The feature contributions reconstruct the final posterior log-odds. See `reports/step8_feature_contributions.md`.
+- **GitHub Actions verification passed** for commit `f19b051`: the repository's automated tests and analysis/demo scripts completed successfully.
+- Step 9 is next: quantify uncertainty, examine decision thresholds and error costs, analyse feature dependence, and assess a suitable model comparison.
+- There is no Streamlit app yet. The repository has no declared license for the project source code; the dataset's license does not automatically license the code.
 
 ## What it does
 
@@ -101,7 +102,7 @@ python scripts/bayesian_updating_demo.py
 python scripts/feature_contributions_demo.py
 ```
 
-The latest locally confirmed pre-Step-8 verification run passed all **16 tests** and all six analysis/validation/evaluation/demo commands. Step 8 adds four more unit tests; its expanded suite and new contribution demo must be run after pulling the latest changes.
+**Latest Step 8 local verification:** 20 unit tests passed in 0.047 seconds. The feature-contribution demo ran on the deterministic split (227 training rows, 76 held-out rows), reconstructed total log-odds of `-1.645294`, and returned `P(class 1) = 0.161746` for held-out row index 256. Its predicted class was 0, matching the retrospective dataset label. The full GitHub Actions workflow also passed for commit `f19b051`.
 
 ### What the scripts generate
 
