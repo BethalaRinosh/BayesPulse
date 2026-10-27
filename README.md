@@ -7,7 +7,7 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 
 ## Project status
 
-- **Current stage:** Step 5 in progress — all 11 unit tests pass in the user's environment. The GaussianNB comparison script's package import path was fixed; rerun the comparison to confirm numerical parity.
+- **Current stage:** Step 6 in progress — all 11 unit tests pass, and the continuous-only implementation matches scikit-learn GaussianNB within the configured tolerance. The full hybrid model's held-out evaluation script is committed; local execution and result review are pending.
 - **Dataset selected:** UCI Heart Disease, Cleveland subset.
 - **Implementation status:** Dataset EDA, distribution diagnostics, and a from-scratch hybrid Naive Bayes classifier are present. The classifier uses Gaussian likelihoods for continuous features and Laplace-smoothed categorical likelihoods for discrete-coded features.
 - **Repository audit:** The repository was empty when inspected. The README, dataset, EDA script, and Step 2 report now establish the project baseline; no existing project files were overwritten or removed.
@@ -18,8 +18,8 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 2. Explore data quality, class balance, feature types, and summary statistics.
 3. Fit and diagnose per-class feature distributions. Assess Gaussian assumptions with histograms, Q-Q plots, and Shapiro-Wilk tests where appropriate; consider log-normal or KDE alternatives when justified. Use Bernoulli/categorical probabilities with Laplace smoothing for discrete features.
 4. Implement Naive Bayes from scratch in NumPy using class priors, Gaussian continuous-feature likelihoods, Laplace-smoothed categorical likelihoods, and normalized log-space posteriors. (Implemented; see `bayespulse/naive_bayes.py`.)
-5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies. (11 unit tests pass; numerical comparison rerun is pending after a Windows import-path fix.)
-6. Evaluate on a proper held-out split or cross-validation using confusion matrix, precision, recall, F1, ROC-AUC, and a calibration curve.
+5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies. (Verified: 11 unit tests pass; priors and predictions match; maximum parameter difference 2.842e-13 and maximum held-out probability difference 3.109e-15.)
+6. Evaluate on a proper held-out split using confusion matrix, precision, recall, F1, ROC-AUC, Brier score, and a calibration curve. (Script committed; local run pending.)
 7. Add a feature-by-feature Bayesian updating demonstration.
 8. Add interpretable per-feature log-likelihood ratios.
 9. Add bootstrap uncertainty intervals, cost-sensitive thresholds, and feature-dependence/model comparison analysis where feasible.
@@ -86,9 +86,10 @@ python -m unittest discover -s tests -v
 python scripts/explore_dataset.py
 python scripts/fit_distributions.py
 python scripts/validate_against_sklearn.py
+python scripts/evaluate_model.py
 ```
 
-The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBayes`. It accepts a numeric 2D NumPy array; represent missing feature values as `numpy.nan`, and pass continuous and categorical column indices explicitly. Fit all model parameters on training data only. The Step 4 unit tests cover priors, posterior normalization, separated synthetic classes, missing features, unseen categories, constant features, invalid inputs, single-class/missing-label rejection, and prediction-before-fit. The user ran the suite and reported 9 tests with 1 error: `predict()` raised `AttributeError` before the fitted-state check. This has been fixed to raise a clear `RuntimeError`, and the test now asserts that message. **The suite must be rerun after the fix before it can be marked passing.**
+The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBayes`. It accepts a numeric 2D NumPy array; represent missing feature values as `numpy.nan`, and pass continuous and categorical column indices explicitly. Fit all model parameters on training data only. The Step 4 unit tests cover priors, posterior normalization, separated synthetic classes, missing features, unseen categories, constant features, invalid inputs, single-class/missing-label rejection, and prediction-before-fit. The user reran the suite after the fix: all 11 tests passed. The GaussianNB comparison also passed: class priors and held-out predictions matched; maximum fitted mean/variance difference was 2.842e-13 and maximum held-out probability difference was 3.109e-15.
 
 ## Decisions and open questions
 
@@ -112,9 +113,14 @@ The file inventory, known issues, fixes, and remaining verification limits are r
 
 ## Step 5: implementation validation
 
-The user-provided output confirms dependency installation was already satisfied and both EDA/distribution scripts completed. It also exposed the prediction-before-fit bug described above. The fix is committed. The GaussianNB comparison harness is available at [`scripts/validate_against_sklearn.py`](scripts/validate_against_sklearn.py); run it alongside the unit suite after pulling the latest `main`. Step 5's actual comparison values and post-fix test status remain pending. See [`reports/step5_validation.md`](reports/step5_validation.md) and [`reports/step4_repo_audit.md`](reports/step4_repo_audit.md).
+The user-provided output confirms dependency installation was already satisfied and both EDA/distribution scripts completed. It also exposed the prediction-before-fit bug described above. The fix is committed. The GaussianNB comparison harness is available at [`scripts/validate_against_sklearn.py`](scripts/validate_against_sklearn.py); run it alongside the unit suite after pulling the latest `main`. Step 5 was verified by the user's local run: all 11 unit tests passed, and the continuous-only implementation matched GaussianNB within tolerance. See [`reports/step5_validation.md`](reports/step5_validation.md) and [`reports/step4_repo_audit.md`](reports/step4_repo_audit.md).
 
 
 ## Step 5 repository audit
 
-The complete file inventory, dependency review, user-run results, prediction-before-fit fix, `.gitignore` hygiene change, and outstanding verification gate are recorded in [`reports/step5_repo_audit.md`](reports/step5_repo_audit.md). **Before Step 6, pull the latest `main`, rerun the unit suite, and run `python scripts/validate_against_sklearn.py`.** Numerical comparison results are not yet available, so no equivalence claim is made.
+The complete file inventory, dependency review, user-run results, prediction-before-fit fix, `.gitignore` hygiene change, and outstanding verification gate are recorded in [`reports/step5_repo_audit.md`](reports/step5_repo_audit.md). Step 5 is complete based on user-provided local output. The numerical comparison matched within tolerance. Step 6's held-out evaluation implementation and protocol are recorded in [`reports/step6_evaluation.md`](reports/step6_evaluation.md); its runtime results remain pending.
+
+
+## Step 6: held-out evaluation
+
+Run `python scripts/evaluate_model.py` from the repository root. It evaluates all 13 predictors on a stratified 75/25 split (seed 42), fits only on training rows, and reports accuracy, class-1 precision/recall/F1, ROC-AUC, Brier score, a confusion matrix, and calibration bins. It writes a Markdown result report and three plots under `reports/evaluation/`; generated outputs are ignored by Git. Runtime metrics are not claimed until the script is run locally and reviewed. See [`reports/step6_evaluation.md`](reports/step6_evaluation.md).
