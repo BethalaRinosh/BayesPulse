@@ -107,6 +107,12 @@ class TestHybridNaiveBayes(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "Call fit before predict"):
             model.predict(self.X)
 
+    def test_failed_refit_does_not_leave_model_marked_fitted(self):
+        with self.assertRaises(ValueError):
+            self.model.fit(self.X, np.zeros(len(self.y), dtype=int))
+        with self.assertRaisesRegex(RuntimeError, "Call fit before predict"):
+            self.model.predict(self.X)
+
     def test_wrong_feature_count_is_rejected(self):
         with self.assertRaises(ValueError):
             self.model.predict(np.array([[1.0]]))
