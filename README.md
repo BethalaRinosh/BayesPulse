@@ -7,10 +7,10 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 
 ## Project status
 
-- **Current stage:** Step 1 — repository reconnaissance and source review.
+- **Current stage:** Step 2 complete — dataset acquisition and exploratory analysis.
 - **Dataset selected:** UCI Heart Disease, Cleveland subset.
-- **Implementation status:** No model code has been written yet.
-- **Repository audit:** The repository was empty when inspected; this README establishes the initial project record. No existing project files were overwritten or removed.
+- **Implementation status:** Cleveland dataset and descriptive EDA script added. No predictive model code has been written yet.
+- **Repository audit:** The repository was empty when inspected. The README, dataset, EDA script, and Step 2 report now establish the project baseline; no existing project files were overwritten or removed.
 
 ## Planned approach
 
@@ -33,7 +33,7 @@ The project will be implemented one step at a time. Core probability calculation
 **UCI Machine Learning Repository: Heart Disease**  
 https://archive.ics.uci.edu/dataset/45/heart+disease
 
-The UCI listing describes 303 Cleveland instances and 13 commonly used predictors. The original target `num` has values 0–4; this project plans to define the binary target as 0 = no recorded heart disease and 1 = recorded heart disease (original values 1–4). The exact selected file, missing-value handling, and class counts will be recorded during dataset acquisition.
+The UCI listing describes 303 Cleveland instances and 13 commonly used predictors. The original target `num` has values 0–4; this project plans to define the binary target as 0 = no recorded heart disease and 1 = recorded heart disease (original values 1–4). The selected file is `data/cleveland.csv`. The target mapping, missing-value counts, class counts, descriptive statistics, feature-type plan, and limitations are recorded in `reports/step2_dataset_eda.md`.
 
 Dataset license: **CC BY 4.0**. Attribution will be retained in the project documentation.
 
@@ -57,16 +57,16 @@ These are planned reference sources for the implementation. No third-party proje
 - Its README describes a from-scratch Naive Bayes implementation and a comparison with scikit-learn GaussianNB.
 - A LICENSE file was not found at the repository's root during this review, so its reuse permissions are **unclear**. **No code from this repository will be copied.** It may only serve as a high-level topic reference unless a compatible license is confirmed.
 
-## Planned environment
+## Dataset exploration (Step 2)\n\n- Dataset: 303 rows, 13 predictors, and the original `num` target.\n- Original target counts: 0=164, 1=55, 2=36, 3=35, 4=13. Binary mapping (`num > 0`): class 0=164 and class 1=139.\n- Missing predictors: `ca` has 4 missing values; `thal` has 2. The target has no missing values. The data file preserves `?` markers.\n- EDA command: `python scripts/explore_dataset.py`. It writes descriptive CSVs and histograms under `reports/eda/` when run locally.\n- Measured statistics and handling decisions are documented in `reports/step2_dataset_eda.md`.\n\n## Planned environment
 
 Python with NumPy, pandas, SciPy, matplotlib, scikit-learn (validation and evaluation only), and Streamlit. The exact dependency pins and installation instructions will be added after the implementation environment is tested.
 
 ## Run instructions
 
-There is no runnable application yet. Setup and run commands will be added as the project becomes executable; do not treat this initial README as a working install guide.
+There is no predictive model or Streamlit application yet. For Step 2 exploration, run `python scripts/explore_dataset.py` from the repository root after installing pandas and matplotlib. The script has not been executed in GitHub's remote environment; generated plots are created locally when you run it.
 
 ## Decisions and open questions
 
 - Dataset choice confirmed: UCI Heart Disease, Cleveland subset.
-- Existing repository files: none were present at inspection time.
+- Existing repository files: none were present at inspection time; Step 2 added `data/cleveland.csv`, `scripts/explore_dataset.py`, and `reports/step2_dataset_eda.md`.
 - No model architecture, distribution choice, evaluation result, or performance metric has been claimed as implemented or measured yet.
