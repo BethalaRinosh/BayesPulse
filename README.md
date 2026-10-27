@@ -7,7 +7,7 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 
 ## Project status
 
-- **Current stage:** Step 7 in progress — Step 5 numerical validation and Step 6 held-out evaluation have passed in the user's environment. The sequential Bayesian posterior-trace method, demo script, and tests are committed; local verification of Step 7 is pending.
+- **Current stage:** Step 7 complete — the user ran all 13 unit tests successfully and verified the sequential Bayesian updating demo. Step 5 numerical validation and Step 6 held-out evaluation also passed in the user's environment.
 - **Dataset selected:** UCI Heart Disease, Cleveland subset.
 - **Implementation status:** Dataset EDA, distribution diagnostics, and a from-scratch hybrid Naive Bayes classifier are present. The classifier uses Gaussian likelihoods for continuous features and Laplace-smoothed categorical likelihoods for discrete-coded features.
 - **Repository audit:** The repository was empty when inspected. The README, dataset, EDA script, and Step 2 report now establish the project baseline; no existing project files were overwritten or removed.
@@ -20,7 +20,7 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 4. Implement Naive Bayes from scratch in NumPy using class priors, Gaussian continuous-feature likelihoods, Laplace-smoothed categorical likelihoods, and normalized log-space posteriors. (Implemented; see `bayespulse/naive_bayes.py`.)
 5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies. (Verified: 11 unit tests pass; priors and predictions match; maximum parameter difference 2.842e-13 and maximum held-out probability difference 3.109e-15.)
 6. Evaluate on a proper held-out split using confusion matrix, precision, recall, F1, ROC-AUC, Brier score, and a calibration curve. (Verified on one 76-row held-out split; results in `reports/step6_evaluation.md`.)
-7. Add a feature-by-feature Bayesian updating demonstration. (Implemented in `predict_proba_progression` and `scripts/bayesian_updating_demo.py`; local verification pending.)
+7. Add a feature-by-feature Bayesian updating demonstration. (Implemented and verified: all 13 unit tests pass; the demo completed on a held-out sample. See `reports/step7_bayesian_updating.md`.)
 8. Add interpretable per-feature log-likelihood ratios.
 9. Add bootstrap uncertainty intervals, cost-sensitive thresholds, and feature-dependence/model comparison analysis where feasible.
 10. Build a Streamlit demo with input validation, risk estimates, contribution breakdowns, distribution context, and a visible disclaimer.
@@ -133,4 +133,4 @@ The user ran the 11-test suite successfully and executed `scripts/evaluate_model
 
 ## Step 7: sequential Bayesian updating
 
-`HybridNaiveBayes.predict_proba_progression(X)` returns posterior probabilities starting with class priors and updating after each feature. Run `python scripts/bayesian_updating_demo.py` to trace one deterministic held-out sample. The method, demo, and added tests are committed; the user must run the unit suite and demo before Step 7 is marked complete. See [`reports/step7_bayesian_updating.md`](reports/step7_bayesian_updating.md).
+`HybridNaiveBayes.predict_proba_progression(X)` returns posterior probabilities starting with class priors and updating after each feature. Run `python scripts/bayesian_updating_demo.py` to trace one deterministic held-out sample. **Verified in the user's environment:** all 13 unit tests passed, and the demo completed. For the displayed held-out row (dataset index 256), the posterior ended at P(class 0) = 0.836706 and P(class 1) = 0.163294; the retrospective label was 0. This is one illustrative sample, not evidence of clinical validity. See [`reports/step7_bayesian_updating.md`](reports/step7_bayesian_updating.md).
