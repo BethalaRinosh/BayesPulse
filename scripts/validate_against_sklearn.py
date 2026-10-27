@@ -8,6 +8,11 @@ Run from repository root:
     python scripts/validate_against_sklearn.py
 """
 from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
 import pandas as pd
@@ -16,7 +21,6 @@ from sklearn.naive_bayes import GaussianNB
 
 from bayespulse.naive_bayes import HybridNaiveBayes
 
-ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "cleveland.csv"
 CONTINUOUS = ["age", "trestbps", "chol", "thalach", "oldpeak"]
 TARGET = "num"
