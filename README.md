@@ -46,7 +46,10 @@ BayesPulse/
 ├── .github/
 │   └── workflows/
 │       └── verify.yml               # Automated tests and script checks
-├── app.py                           # Streamlit educational interface
+├── app.py                           # Existing Streamlit interface, retained during migration
+├── backend/
+│   ├── __init__.py
+│   └── main.py                       # FastAPI adapter for the existing model
 ├── bayespulse/
 │   └── naive_bayes.py               # NumPy-only hybrid Naive Bayes estimator
 ├── data/
@@ -94,6 +97,28 @@ python -m pip install -r requirements.txt
 ```
 
 If PowerShell blocks activation, use the Python executable directly at `.venv\Scripts\python.exe` or follow your local Python environment policy.
+
+## API backend migration (Step 1)
+
+The migration branch `ui/react-fastapi-migration` adds a thin FastAPI layer around the existing NumPy model. The classifier in `bayespulse/naive_bayes.py` is unchanged, and the Streamlit app remains available while the replacement is developed.
+
+From a clean checkout of the migration branch, install dependencies as usual, then run:
+
+```powershell
+python -m py_compile app.py backend/main.py
+python -m unittest discover -s tests -v
+uvicorn backend.main:app --reload
+```
+
+The API is available at `http://127.0.0.1:8000`; its interactive schema is at `http://127.0.0.1:8000/docs`.
+
+- `GET /api/v1/health`: service health.
+- `GET /api/v1/metadata`: canonical feature order, input types, observed ranges/category options, defaults, dataset metadata, and limitations.
+- `POST /api/v1/predict`: posterior probabilities, predicted dataset class, per-feature log-likelihood ratios, prior/total log-odds, and sequential posterior trace.
+
+Prediction requests use `{"features": {"age": 55, "ca": null}}`. Omitted or null feature values are treated as missing. Unknown feature names and non-finite values are rejected. The API only allows browser origins on localhost port 5173 for the planned local frontend.
+
+The API deliberately preserves the existing app's educational-only interpretation: it fits the demo model on all 303 records, so responses are not independent held-out estimates. Do not enter real patient information. This first migration step does not replace or delete Streamlit.
 
 ## Launch the interactive app
 
