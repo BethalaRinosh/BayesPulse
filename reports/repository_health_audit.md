@@ -8,7 +8,7 @@
 
 - **Step 8 passed:** the user ran 20 tests and the feature-contribution demo; the contribution sum reconstructed posterior log-odds.
 - **Step 9 passed:** the user ran 24 tests, the GaussianNB equivalence comparison printed PASS, and the uncertainty/QDA analysis completed. GitHub Actions passed for the Step 9 commit series.
-- **Step 10 verified locally:** `app.py` compiled; all 25 tests passed in 0.445 seconds; Streamlit launched at `http://localhost:8501`; and the user reported that the browser UI looked fine. Two non-fatal `use_container_width` deprecation warnings remain.
+- **Step 10 passed in the original local environment:** `app.py` compiled, all 25 tests passed, Streamlit launched, and the user reported that the UI looked fine. A subsequent fresh-clone run installed newer dependency versions and exposed a read-only NumPy array in the integration test setup. The test row now uses `.copy()` before mutating categorical values. The fresh-clone suite must be rerun to verify the fix. The user's Streamlit version also emitted non-fatal `use_container_width` deprecation warnings.
 
 ## Previously identified defects and fixes
 
@@ -38,15 +38,15 @@ These results are conditional on one small fixed split and are not clinical vali
 - The app trains on the full 303-row dataset for interactive demonstration. Its output is not a held-out prediction; this is stated in the UI and README.
 - The UI warns users not to enter real patient information and not to use results for diagnosis or patient care.
 - The workflow checks `python -m py_compile app.py`; the new integration smoke test exercises the data/model interface and checks that feature contributions reconstruct posterior log-odds.
-- The user confirmed that the browser UI looked fine. The integration smoke test covers model/data output, but it does not automate full browser interaction.
+- The user confirmed that the browser UI looked fine in the original environment. The integration smoke test covers model/data output, but it does not automate full browser interaction. The clean-clone test failure is being addressed by copying the NumPy row before mutation; verification remains pending.
 
 ## Remaining repository gaps
 
 - `requirements.txt` specifies minimum versions rather than a fully locked environment.
 - No `LICENSE` file declares reuse permissions for project source code; the dataset license does not automatically license the code.
-- A fresh-clone installation and full verification have not been confirmed by the user.
+- Fresh-clone installation succeeded, but full verification did not: 24 tests passed and the Streamlit integration test errored because its NumPy row was read-only. A `.copy()` fix has been pushed; the user must rerun the clean-clone suite to confirm.
 - Streamlit browser behavior and missing-feature interaction need manual verification.
 
 ## Step 10 verification record\n\n```powershell\npython -m py_compile app.py\npython -m unittest discover -s tests -v\nstreamlit run app.py\n```\n\n- Syntax check: passed.\n- Unit and integration tests: 25 passed, 0 failures/errors, in 0.445 seconds.\n- Streamlit server: started at `http://localhost:8501`; the user reported that the browser UI looked fine.\n- Two non-fatal deprecation warnings recommend replacing `use_container_width=True` with `width="stretch"`.\n\n## Current conclusion
 
-Steps 8, 9, and 10 are verified locally. Remaining maintenance items are dependency pinning, choosing a source-code license, confirming a fresh-clone setup, checking the latest GitHub Actions run, and replacing the deprecated Streamlit width arguments. None of the observed warnings blocked local tests or app launch.
+Steps 8 and 9 are verified. Step 10 passed in the original environment, but the clean-clone integration test exposed a compatibility issue in test setup. A `.copy()` fix has been pushed and is awaiting clean-clone verification. Remaining maintenance items include dependency pinning, choosing a source-code license, checking the latest GitHub Actions run, and replacing deprecated Streamlit width arguments.
