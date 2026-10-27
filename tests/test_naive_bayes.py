@@ -55,6 +55,20 @@ class TestHybridNaiveBayes(unittest.TestCase):
         self.assertTrue(np.isfinite(probabilities).all())
         self.assertAlmostEqual(float(probabilities.sum()), 1.0)
 
+    def test_categorical_probabilities_include_unknown_bucket_and_sum_to_one(self):
+        known = np.exp(self.model.category_log_probs_[1])
+        unknown = np.exp(self.model.category_unknown_log_probs_[1])
+        np.testing.assert_allclose(known.sum(axis=1) + unknown, np.ones(len(self.model.classes_)))
+
+    def test_continuous_feature_missing_for_one_class_is_rejected(self):
+        X = np.array([
+            [np.nan, 0.0], [np.nan, 1.0],
+            [3.0, 0.0], [4.0, 1.0],
+        ])
+        y = np.array([0, 0, 1, 1])
+        with self.assertRaisesRegex(ValueError, "no observed values in class"):
+            HybridNaiveBayes((0,), (1,)).fit(X, y)
+
     def test_constant_continuous_feature_does_not_crash(self):
         X = np.array([[2.0, 0.0], [2.0, 0.0], [2.0, 1.0], [2.0, 1.0]])
         model = HybridNaiveBayes((0,), (1,)).fit(X, np.array([0, 0, 1, 1]))
@@ -65,6 +79,18 @@ class TestHybridNaiveBayes(unittest.TestCase):
             HybridNaiveBayes((0,), (0,))
         with self.assertRaises(ValueError):
             HybridNaiveBayes((0,), (1,), alpha=0)
+        with self.assertRaises(ValueError):
+            HybridNaiveBayes((0,), (1,), alpha=np.nan)
+        with self.assertRaises(ValueError):
+            HybridNaiveBayes((0,), (1,), alpha=np.inf)
+        with self.assertRaises(ValueError):
+            HybridNaiveBayes((0,), (1,), variance_smoothing=np.nan)
+        with self.assertRaises(ValueError):
+            HybridNaiveBayes((0,), (1,), variance_smoothing=np.inf)
+        with self.assertRaises(ValueError):
+            HybridNaiveBayes((0.5,), (1,))
+        with self.assertRaises(ValueError):
+            HybridNaiveBayes((True,), (1,))
         with self.assertRaises(ValueError):
             HybridNaiveBayes((0,), (1,)).fit(np.array([[1.0, np.inf]]), np.array([0]))
 
