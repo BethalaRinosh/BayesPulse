@@ -31,7 +31,9 @@ class TestBayesPulseAPI(unittest.TestCase):
         request_schema = schema["components"]["schemas"]["FeatureValues"]
         self.assertEqual(list(request_schema["properties"]), FEATURES)
         example = request_schema["example"]
-        self.assertEqual(list(example), FEATURES)
+        # JSON object key order is not semantically significant; assert the
+        # complete field set while schema properties retain canonical order.
+        self.assertEqual(set(example), set(FEATURES))
         self.assertEqual(example["age"], 55)
         self.assertEqual(example["thal"], 3)
 
