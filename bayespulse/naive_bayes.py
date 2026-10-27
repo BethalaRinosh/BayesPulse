@@ -78,6 +78,8 @@ class HybridNaiveBayes:
             raise ValueError("A modelled feature cannot be entirely missing in training data.")
 
         self.classes_, class_counts = np.unique(y, return_counts=True)
+        if self.classes_.size < 2:
+            raise ValueError("At least two distinct classes are required for classification.")
         self.class_log_prior_ = np.log(class_counts / class_counts.sum())
         self.n_features_in_ = n_features
         self.gaussian_params_: dict[int, tuple[np.ndarray, np.ndarray]] = {}
