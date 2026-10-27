@@ -61,7 +61,7 @@ python -m unittest discover -s tests -v
 python scripts/validate_against_sklearn.py
 ```
 
-Step 5 completion evidence is confirmed in the user's latest output: all 11 tests pass and the GaussianNB comparison reports PASS. Step 6 has started; run `python scripts/evaluate_model.py` and inspect the metrics, calibration bins, report, and plots.
+Step 5 completion evidence is confirmed in the user's latest output: all 11 tests pass and the GaussianNB comparison reports PASS. Step 6 was subsequently run and documented in `reports/step6_evaluation.md`. Its results predate the categorical-smoothing audit fix and must be refreshed for the current implementation.
 
 ## Gate
 
