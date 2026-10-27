@@ -26,7 +26,8 @@ BayesPulse is an educational Probability & Statistics project that implements a 
 - Decomposes binary posterior log-odds into prior odds and per-feature log-likelihood ratios.
 - Compares the continuous-only implementation with scikit-learn's `GaussianNB`.
 - Reports held-out metrics, calibration diagnostics, bootstrap intervals, decision-cost sensitivity, feature-dependence measures, and a QDA comparator.
-- Provides an interactive educational interface through Streamlit.
+- Provides an interactive educational interface through Streamlit (retained as fallback during migration).
+- Adds a React + TypeScript frontend in `frontend/`, backed by the FastAPI adapter.
 
 ## Dataset and target
 
@@ -50,6 +51,14 @@ BayesPulse/
 ├── backend/
 │   ├── __init__.py
 │   └── main.py                       # FastAPI adapter for the existing model
+├── frontend/
+│   ├── src/
+│   │   ├── App.tsx                   # React learning workspace
+│   │   ├── main.tsx
+│   │   └── styles.css                # Responsive dark interface
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.ts
 ├── bayespulse/
 │   └── naive_bayes.py               # NumPy-only hybrid Naive Bayes estimator
 ├── data/
@@ -119,6 +128,27 @@ The API is available at `http://127.0.0.1:8000`; its interactive schema is at `h
 Prediction requests use `{"features": {"age": 55, "ca": null}}`. Omitted or null feature values are treated as missing. Unknown feature names and non-finite values are rejected. The API only allows browser origins on localhost port 5173 for the planned local frontend.
 
 The API deliberately preserves the existing app's educational-only interpretation: it fits the demo model on all 303 records, so responses are not independent held-out estimates. Do not enter real patient information. This first migration step does not replace or delete Streamlit.
+
+## React frontend (migration branch)
+
+The React + TypeScript interface lives in `frontend/`. Keep the API server running in one terminal:
+
+```powershell
+uvicorn backend.main:app --reload
+```
+
+In a second terminal from the repository root:
+
+```powershell
+cd frontend
+npm install
+npm run build
+npm run dev
+```
+
+Open `http://127.0.0.1:5173`. The frontend reads the feature schema from the API and sends predictions to `http://127.0.0.1:8000` by default. To use a different API address, copy `.env.example` to `.env` and set `VITE_API_URL`, then restart Vite. The backend CORS allowlist currently supports localhost port 5173.
+
+This migration is still under verification. The existing Streamlit interface remains available and has not been removed.
 
 ## Launch the interactive app
 
