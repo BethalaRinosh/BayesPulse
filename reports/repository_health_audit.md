@@ -31,7 +31,7 @@ The repository has a coherent small-project structure, and the submitted earlier
 
 - `.gitignore` covers Python caches, local virtual environments, editor/OS files, and generated analysis/evaluation outputs.
 - `requirements.txt` specifies minimum versions, not a fully locked environment. Clean installs may resolve newer dependency versions over time.
-- No CI workflow is present, so GitHub does not automatically run the tests on every change.
+- A GitHub Actions workflow now runs the unit suite, GaussianNB comparison, and data/evaluation/demo scripts on pushes and pull requests to `main`. The workflow has been committed, but the Actions API currently shows no workflow runs; verify its first run before treating CI as operational.
 - No `LICENSE` file declares reuse permissions for BayesPulse's own source code. The dataset license does not automatically license the project's code. Choose a project-code license deliberately before inviting reuse.
 - No Streamlit app exists yet, although Streamlit is listed as a dependency for the planned future app.
 - A fresh-clone run has not been performed by this audit; code was reviewed from the current GitHub source and the user's prior local logs.
