@@ -102,3 +102,8 @@ The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBa
 - Posterior calculations are performed in log space and normalized with a stable log-sum-exp calculation. A variance floor guards against zero-variance features. Missing feature values are skipped per feature, while missing labels, infinities, invalid feature indices, and malformed shapes are rejected.
 - Unit tests: `tests/test_naive_bayes.py`. Run `python -m unittest discover -s tests -v`.
 - **Verification note:** the files have been statically reviewed; tests have not been run against a clean clone in this environment. Do not describe the tests as passing until the command has been run and its output checked.
+
+
+## Step 4 repository health audit
+
+The file inventory, known issues, fixes, and remaining verification limits are recorded in [`reports/step4_repo_audit.md`](reports/step4_repo_audit.md). A local logic-level smoke test passed for core synthetic cases, but the committed test suite and data scripts have not been executed in a clean clone because direct GitHub cloning is unavailable in this environment. Run the commands in the audit report locally before treating the project as runtime-verified.
