@@ -59,3 +59,8 @@ Review the test output and generated reports before using any diagnostic finding
 ## Follow-up after user-provided runtime output
 
 The user ran dependency installation, the unit suite, EDA, and distribution diagnostics. Installation was already satisfied; EDA and distribution diagnostics completed. The test suite had one failure in prediction-before-fit handling. Step 5 fixed the ordering in `predict()` and strengthened the test. The unit suite must be rerun to confirm the fix, and the new GaussianNB comparison script must be executed to obtain its actual numeric comparison.
+
+
+## Historical status note
+
+This audit was written during Step 4. Its original statements that tests still required confirmation and Step 5 had not started were superseded by `reports/step5_validation.md`, `reports/step6_evaluation.md`, and `reports/step7_bayesian_updating.md`. For the latest health findings and current verification gate, see `reports/repository_health_audit.md`.
