@@ -126,7 +126,28 @@ class FeatureValues(BaseModel):
 class PredictionRequest(BaseModel):
     """Request wrapper for a prediction."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "example": {
+                "features": {
+                    "age": 55,
+                    "trestbps": 130,
+                    "chol": 240,
+                    "thalach": 150,
+                    "oldpeak": 1.2,
+                    "sex": 1,
+                    "cp": 2,
+                    "fbs": 0,
+                    "restecg": 1,
+                    "exang": 0,
+                    "slope": 2,
+                    "ca": 0,
+                    "thal": 3,
+                }
+            }
+        },
+    )
     features: FeatureValues = Field(
         default_factory=FeatureValues,
         description="Predictor values. Omitted or null features are treated as missing.",
