@@ -8,10 +8,10 @@ BayesPulse is an educational Probability & Statistics project that implements a 
 
 ## Current status
 
-- The from-scratch NumPy classifier, dataset diagnostics, reference comparison, held-out evaluation, and sequential Bayesian updating demo are implemented.
-- A repository health audit identified edge cases in input validation and categorical smoothing. Fixes and additional tests have been committed.
-- **Revalidation is pending.** The previous 13-test result and Step 6/Step 7 numbers were produced before these audit fixes. Run the commands below and review the new output before treating those results as current.
-- There is no Streamlit app yet. A GitHub Actions verification workflow has been added, but no workflow run is visible yet. The repository currently has no declared license for the project source code; the dataset's license does not automatically license the code.
+- The NumPy hybrid Naive Bayes classifier, dataset diagnostics, GaussianNB equivalence check, held-out evaluation, and sequential Bayesian updating demo are implemented.
+- **Repository health verification passed locally:** 16 unit tests passed, the GaussianNB equivalence check passed, and all analysis/evaluation/demo scripts completed successfully after the audit fixes. See `reports/repository_health_audit.md`.
+- Step 8 is in progress: per-feature log-likelihood ratios are implemented with tests and a demo script, but the new Step 8 tests/demo have not yet been run locally.
+- There is no Streamlit app yet. A GitHub Actions verification workflow has been committed, but its first successful run remains unconfirmed. The repository has no declared license for the project source code; the dataset's license does not automatically license the code.
 
 ## What it does
 
@@ -21,6 +21,7 @@ BayesPulse is an educational Probability & Statistics project that implements a 
 - Handles missing predictors by skipping their likelihood contribution rather than silently converting missing values to zero.
 - Normalizes posterior calculations in log space.
 - Exposes feature-by-feature posterior updates for an educational demonstration.
+- Decomposes binary posterior log-odds into prior odds and per-feature log-likelihood ratios.
 - Compares the continuous-only implementation with scikit-learn's `GaussianNB`.
 - Evaluates a fixed stratified held-out split and produces metrics, calibration data, and diagnostic plots.
 
@@ -54,13 +55,15 @@ BayesPulse/
 │   ├── step5_repo_audit.md
 │   ├── step6_evaluation.md
 │   ├── step7_bayesian_updating.md
+│   ├── step8_feature_contributions.md
 │   └── repository_health_audit.md
 ├── scripts/
 │   ├── explore_dataset.py
 │   ├── fit_distributions.py
 │   ├── validate_against_sklearn.py
 │   ├── evaluate_model.py
-│   └── bayesian_updating_demo.py
+│   ├── bayesian_updating_demo.py
+│   └── feature_contributions_demo.py
 ├── tests/
 │   └── test_naive_bayes.py
 ├── requirements.txt
@@ -95,9 +98,10 @@ python scripts/fit_distributions.py
 python scripts/validate_against_sklearn.py
 python scripts/evaluate_model.py
 python scripts/bayesian_updating_demo.py
+python scripts/feature_contributions_demo.py
 ```
 
-The current test suite is expected to contain **16 tests after the audit changes**, but that expectation is not a passing result. Record the actual output. The evaluation and Bayesian demo outputs must be refreshed because the categorical smoothing logic changed.
+The latest locally confirmed pre-Step-8 verification run passed all **16 tests** and all six analysis/validation/evaluation/demo commands. Step 8 adds four more unit tests; its expanded suite and new contribution demo must be run after pulling the latest changes.
 
 ### What the scripts generate
 
@@ -106,6 +110,7 @@ The current test suite is expected to contain **16 tests after the audit changes
 - `validate_against_sklearn.py`: checks continuous-only parameter, prior, probability, and prediction equivalence with `GaussianNB`.
 - `evaluate_model.py`: held-out metrics, calibration table, and ROC/confusion-matrix/calibration plots in `reports/evaluation/`.
 - `bayesian_updating_demo.py`: a deterministic held-out sample's posterior after each feature is incorporated.
+- `feature_contributions_demo.py`: the prior log-odds and each held-out feature's log-likelihood ratio, with positive/negative model-evidence direction.
 
 Generated diagnostic outputs are ignored by Git and can be recreated by rerunning the scripts.
 
@@ -132,6 +137,7 @@ The feature indices are examples only. Supply the correct indices for your datas
 - Naive Bayes assumes features are conditionally independent given the class; real-world predictors may be correlated.
 - Continuous features are currently modelled with Gaussian likelihoods regardless of exploratory diagnostics. The diagnostic script does not automatically select a better distribution.
 - An unseen categorical code is mapped to a shared smoothed `OTHER` bucket.
+- Feature contributions are log-likelihood ratios under the fitted model, not causal effects, medical explanations, or evidence that a feature changes an individual's health.
 - Missing continuous observations must be available in both classes during fitting; otherwise the model rejects the training data rather than silently using different feature evidence for different classes.
 - The current evaluation is a single split of a small dataset. Metrics and calibration bins can vary substantially with the split.
 - No clinical validation, external validation, clinical threshold selection, or deployment safety evaluation has been performed.
