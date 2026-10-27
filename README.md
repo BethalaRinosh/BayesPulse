@@ -11,7 +11,7 @@ BayesPulse is an educational Probability & Statistics project that implements a 
 - The NumPy hybrid Naive Bayes classifier, dataset diagnostics, GaussianNB equivalence check, held-out evaluation, sequential Bayesian updating, per-feature log-odds explanation, and uncertainty/dependence/model-comparison analysis are implemented.
 - **Step 8 verified:** 20 unit tests passed; the contribution sum reconstructed posterior log-odds.
 - **Step 9 verified:** 24 unit tests passed; GaussianNB equivalence validation passed; uncertainty and QDA analysis completed; GitHub Actions passed. Results are documented in `reports/step9_uncertainty_decision_analysis.md`.
-- **Step 10 app implementation is pushed and awaiting verification:** `app.py` provides an interactive Streamlit demonstration with feature inputs, modelled posterior probabilities, per-feature log-likelihood ratios, and a Bayesian updating trace. A model/data integration smoke test was added; the expected suite count is now 25.
+- **Step 10 verified locally:** `app.py` compiled, all 25 tests passed, Streamlit launched, and the user reported that the browser UI looked fine. Streamlit emitted non-fatal deprecation warnings for `use_container_width`; replace those arguments with `width="stretch"` in a future cleanup.
 - The app fits on the full dataset for an educational interactive demonstration. Its displayed probabilities are not held-out test predictions, clinical risk estimates, or evidence of generalization.
 - The project source-code license has not been selected. The dataset's license does not automatically license this repository's source code.
 
