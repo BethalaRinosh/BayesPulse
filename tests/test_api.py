@@ -26,6 +26,22 @@ class TestBayesPulseAPI(unittest.TestCase):
         self.assertEqual(payload["dataset"]["records"], 303)
         self.assertEqual(len(payload["limitations"]), 3)
 
+    def test_openapi_uses_real_feature_names_and_example(self):
+        schema = self.client.get("/openapi.json").json()
+        request_schema = schema["components"]["schemas"]["FeatureValues"]
+        self.assertEqual(list(request_schema["properties"]), FEATURES)
+        example = request_schema["example"]
+        self.assertEqual(list(example), FEATURES)
+        self.assertEqual(example["age"], 55)
+        self.assertEqual(example["thal"], 3)
+
+    def test_unknown_feature_inside_features_is_rejected(self):
+        response = self.client.post(
+            "/api/v1/predict",
+            json={"features": {"age": 55, "made_up_feature": 1}},
+        )
+        self.assertEqual(response.status_code, 422)
+
     def test_prediction_matches_direct_model_output(self):
         frame = load_dataset()
         row = frame[FEATURES].median(numeric_only=True).reindex(FEATURES).to_numpy(dtype=float).copy()
