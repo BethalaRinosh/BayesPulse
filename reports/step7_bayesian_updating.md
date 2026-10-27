@@ -28,9 +28,9 @@ python scripts/bayesian_updating_demo.py
 
 The demonstration is a visualization aid for the Naive Bayes factorization. It shows how each assumed conditionally independent feature changes the posterior under the model. It does not prove that the independence assumption is true, that each feature causally affects the outcome, or that the output is clinically valid.
 
-## Verified results
+## Historical results from the pre-audit implementation
 
-The user ran the commands above locally after pulling commit `6d37b44`. All **13 unit tests passed** (`Ran 13 tests in 0.047s; OK`). The demo completed without a traceback.
+The user ran the commands above locally after pulling commit `6d37b44`. All **13 unit tests passed** (`Ran 13 tests in 0.047s; OK`), and the demo completed without a traceback. These results predate the repository health fixes. The updated tests and demo must be rerun because the categorical smoothing logic has changed.
 
 For the deterministic held-out sample:
 
@@ -41,4 +41,4 @@ For the deterministic held-out sample:
 - Predicted class: 0
 - Retrospective dataset label: 0
 
-The posterior changes as each feature likelihood is incorporated. This is expected behavior for a Naive Bayes model and is not evidence that the features causally change risk. The displayed row is a single example; it does not establish clinical validity or generalization. No runtime or test errors were visible in the submitted output.
+The posterior changes as each feature likelihood is incorporated. This is expected behavior for a Naive Bayes model and is not evidence that the features causally change risk. The displayed row is a single example; it does not establish clinical validity or generalization. The numeric trace above is historical and should be replaced with the next user-verified run.
