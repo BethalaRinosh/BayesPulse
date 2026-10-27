@@ -69,6 +69,8 @@ class HybridNaiveBayes:
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "HybridNaiveBayes":
         """Estimate priors and per-class likelihood parameters from training data."""
+        # Do not leave a previous fit marked usable if refitting fails midway.
+        self._fitted = False
         X = self._as_matrix(X)
         y = np.asarray(y)
         if y.ndim != 1 or len(y) != X.shape[0]:
