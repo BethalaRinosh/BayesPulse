@@ -16,7 +16,7 @@ The repository has a coherent small-project structure, and the submitted earlier
 4. **A continuous feature could have no observed training values in one class.** The old code would leave that class's Gaussian mean as NaN and skip that feature only for that class during prediction, causing class scores to use inconsistent evidence. Fitting now rejects that case.
 5. **A failed refit could leave a model marked as fitted after partially replacing internal state.** The fitted flag is now cleared at the start of `fit`; a regression test checks that prediction is rejected after a failed refit.
 6. **Documentation drift:** the old README repeated stage notes with contradictory stale verification statements. It has been reorganized into one current guide. Step 6 metrics and Step 7 trace are explicitly marked as historical because the smoothing change can alter their output.
-7. **Distribution diagnostics could silently convert a missing target into class 0.** The Step 3 script previously mapped `num > 0` before checking target missingness, which can turn a missing comparison into `False`. It now rejects missing labels and target values outside the documented 0–4 range before deriving the binary target.
+7. **Distribution diagnostics could silently convert a missing target into class 0.** The Step 3 script previously mapped `num > 0` before checking target missingness, which can turn a missing comparison into `False`. It now rejects missing labels and target values outside the documented 0–4 range before deriving the binary target. It also rejects entirely missing predictor columns and empty per-class continuous groups instead of failing later at plotting/statistics calls.
 
 ## Static review findings
 
