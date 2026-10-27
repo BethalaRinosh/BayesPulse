@@ -14,10 +14,6 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "cleveland.csv"
 OUT_DIR = ROOT / "reports" / "eda"
 
-COLUMNS = [
-    "age", "sex", "cp", "trestbps", "chol", "fbs", "restecg",
-    "thalach", "exang", "oldpeak", "slope", "ca", "thal", "num",
-]
 CONTINUOUS = ["age", "trestbps", "chol", "thalach", "oldpeak"]
 CATEGORICAL = ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"]
 
