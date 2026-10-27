@@ -2,64 +2,64 @@
 
 **Audit date:** 2026-10-28  
 **Repository:** [BethalaRinosh/BayesPulse](https://github.com/BethalaRinosh/BayesPulse)  
-**Scope:** Current tracked tree, model implementation, tests, analysis scripts, dependencies, documentation consistency, dataset provenance, CI, and repository hygiene.
+**Scope:** Model implementation, tests, analysis scripts, Streamlit app, dependencies, documentation, dataset provenance, CI, and repository hygiene.
 
 ## Executive result
 
-Step 8 has passed the user's local verification: 20 unit tests passed, the feature-contribution demo completed, and the contribution sum reconstructed the posterior log-odds. GitHub Actions also passed for the Step 8 commit.
-
-Step 9 has now been added and pushed. It introduces bootstrap intervals, a hypothetical decision-cost threshold sweep, mixed-type feature-dependence diagnostics, a QDA comparison, and four helper tests. **Step 9 is not yet verified locally.** The latest CI run must also be checked before treating the step as complete.
+- **Step 8 passed:** the user ran 20 tests and the feature-contribution demo; the contribution sum reconstructed the posterior log-odds.
+- **Step 9 passed:** the user ran 24 tests, the GaussianNB equivalence comparison printed PASS, and the uncertainty/QDA analysis completed. GitHub Actions also passed for the Step 9 commit series.
+- **Step 10 is implemented but awaiting browser verification:** `app.py` provides an educational Streamlit UI. The user must still run it locally and check the visible controls and outputs.
 
 ## Previously identified defects and fixes
 
-1. **Categorical smoothing for unseen categories:** the denominator now includes a shared OTHER bucket so probabilities over known categories plus OTHER sum to one.
-2. **Non-finite hyperparameters:** alpha and variance_smoothing must be finite and satisfy their sign constraints.
-3. **Feature-index validation:** non-integer and boolean indices are rejected explicitly.
-4. **Missing continuous values by class:** fitting rejects a continuous feature with no observed training values in either class rather than silently omitting class-specific evidence.
-5. **Failed refit state:** the fitted flag is cleared before refitting, so a failed refit does not leave a partially updated model marked usable.
-6. **Missing/invalid target in distribution diagnostics:** target values are validated before binary conversion; fully missing columns and empty class groups are rejected.
-7. **Documentation drift:** README and stage reports now distinguish confirmed results from pending verification and state the project's non-clinical scope.
+1. Categorical smoothing now includes a shared OTHER bucket in the denominator so known categories plus OTHER form a normalized distribution.
+2. `alpha` and `variance_smoothing` must be finite and satisfy their sign constraints.
+3. Non-integer and boolean feature indices are rejected.
+4. Fitting rejects continuous features with no observed values in one class.
+5. A failed refit cannot leave the model marked fitted.
+6. Distribution diagnostics reject missing/invalid targets, entirely missing predictor columns, and empty per-class groups.
+7. README and stage reports distinguish verified results from pending work and state the educational-only scope.
 
-## Step 8 verification record
+## Step 9 verification record
 
-The user ran the 20-test suite and feature-contribution demo successfully. The demo used the fixed stratified split (227 training rows, 76 held-out rows), reconstructed total log-odds of -1.645294, and returned P(class 1) = 0.161746 for held-out row 256. The predicted class 0 matched that row's retrospective label. The GitHub Actions run for commit f19b051 also completed successfully.
+- 24 tests passed in 0.464 seconds.
+- GaussianNB comparison passed: priors matched; maximum fitted mean/variance difference was 2.842e-13; maximum held-out probability difference was 3.109e-15; predictions matched.
+- The uncertainty analysis completed on 227 training rows and 76 held-out rows with 2,000 bootstrap replicates.
+- Hybrid Naive Bayes point metrics: accuracy 0.8816, class-1 recall 0.9429, ROC-AUC 0.9742, Brier score 0.0796.
+- QDA comparator point metrics: accuracy 0.8947, class-1 recall 0.9143, ROC-AUC 0.9519, Brier score 0.0949.
+- Hybrid Naive Bayes bootstrap 95% intervals: accuracy [0.8026, 0.9474], class-1 recall [0.8571, 1.0000], ROC-AUC [0.9394, 0.9951], Brier score [0.0393, 0.1268].
+- GitHub Actions passed for the Step 9 commit `9d55ca5fd16f6ff77a56fc5e5c90a85165ae7b58`.
 
-## Step 9 implementation review
+These results are conditional on one small fixed split and are not clinical validation.
 
-- `scripts/uncertainty_decision_analysis.py` uses the same fixed stratified split and fits both models and QDA preprocessing on training rows only.
-- Bootstrap intervals resample held-out prediction indices within each observed class. They are conditional on the held-out partition, not a full retraining or external-validation interval.
-- False-negative and false-positive costs are explicit illustrative constants (5 and 1). They must not be represented as medically appropriate costs.
-- Continuous dependence is summarized with absolute Spearman correlation; categorical dependence with Cramér's V; feature-target dependence with mutual information estimated on training rows.
-- QDA uses training-fitted imputation, one-hot encoding for categorical predictors, and covariance regularization. It is a comparator with different assumptions, not a claim that QDA is superior.
-- Four tests were added for bootstrap interval determinism/validity, missing-class rejection, and Cramér's V edge cases.
-- The GitHub Actions workflow now runs the Step 9 script. The new 24-test suite and full script output still require local verification.
+## Step 10 implementation review
+
+- `app.py` uses the existing estimator and exposes continuous inputs, categorical-coded dropdowns, optional missing predictors, posterior probabilities, per-feature log-likelihood ratios, and a Bayesian updating trace.
+- The app trains on the full 303-row dataset for interactive demonstration. Its output is not a held-out prediction; this is stated in the UI and README.
+- The UI warns users not to enter real patient information and not to use results for diagnosis or patient care.
+- The workflow now includes `python -m py_compile app.py`.
+- Local browser launch and interaction are still unverified. A syntax check alone cannot establish the UI runs correctly.
 
 ## Remaining repository gaps
 
-- `requirements.txt` specifies minimum versions rather than a fully locked environment; dependency resolution may change across clean installs.
-- No `LICENSE` file declares reuse permissions for BayesPulse source code. The UCI dataset license does not automatically license this project's code.
-- No Streamlit app exists yet, although Streamlit remains listed in requirements for planned future work.
+- `requirements.txt` specifies minimum versions rather than a fully locked environment.
+- No `LICENSE` file declares reuse permissions for project source code; the dataset license does not automatically license the code.
 - A fresh-clone installation and full verification have not been confirmed by the user.
-- The latest workflow run for the Step 9 changes must be checked; the prior Step 8 success does not certify later commits.
+- Streamlit browser behavior and missing-feature interaction need manual verification.
 
-## Required verification gate for Step 9
+## Step 10 verification gate
 
-From the repository root, after pulling latest main:
+After pulling latest main, run:
 
 ```powershell
 git pull origin main
+python -m py_compile app.py
 python -m unittest discover -s tests -v
-python scripts/validate_against_sklearn.py
-python scripts/explore_dataset.py
-python scripts/fit_distributions.py
-python scripts/evaluate_model.py
-python scripts/bayesian_updating_demo.py
-python scripts/feature_contributions_demo.py
-python scripts/uncertainty_decision_analysis.py
+streamlit run app.py
 ```
 
-Expected test count: **24**. Check that all tests pass, the GaussianNB comparison prints PASS, all scripts finish, the new report is written, QDA returns finite probabilities/metrics, and the bootstrap intervals are finite and ordered. Review any warnings rather than suppressing them blindly.
+In the browser, confirm that the page loads, the inputs can be changed, the demonstration button displays probabilities and feature evidence, the Bayesian trace appears, and marking a predictor missing does not crash the app. Confirm the warning remains visible.
 
 ## Current conclusion
 
-The Step 8 implementation and verification are complete. Step 9 is implemented but remains pending user-run verification. The next action is to inspect the full local output and latest GitHub Actions result, fix any defects found, and only then close Step 9.
+Steps 8 and 9 are verified. Step 10's implementation is committed but must not be marked complete until the local Streamlit UI is tested. The next step is to review the user's run output, fix any issues, update the README/report, and verify the latest GitHub Actions result.
