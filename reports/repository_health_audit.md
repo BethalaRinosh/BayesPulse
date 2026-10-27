@@ -8,7 +8,7 @@
 
 - **Step 8 passed:** the user ran 20 tests and the feature-contribution demo; the contribution sum reconstructed posterior log-odds.
 - **Step 9 passed:** the user ran 24 tests, the GaussianNB equivalence comparison printed PASS, and the uncertainty/QDA analysis completed. GitHub Actions passed for the Step 9 commit series.
-- **Step 10 is implemented but awaiting local verification:** `app.py` provides an educational Streamlit UI. A new integration smoke test checks dataset loading, predictions, evidence output, and posterior reconstruction. The updated 25-test suite and browser UI still require local verification.
+- **Step 10 verified locally:** `app.py` compiled; all 25 tests passed in 0.445 seconds; Streamlit launched at `http://localhost:8501`; and the user reported that the browser UI looked fine. Two non-fatal `use_container_width` deprecation warnings remain.
 
 ## Previously identified defects and fixes
 
@@ -38,7 +38,7 @@ These results are conditional on one small fixed split and are not clinical vali
 - The app trains on the full 303-row dataset for interactive demonstration. Its output is not a held-out prediction; this is stated in the UI and README.
 - The UI warns users not to enter real patient information and not to use results for diagnosis or patient care.
 - The workflow checks `python -m py_compile app.py`; the new integration smoke test exercises the data/model interface and checks that feature contributions reconstruct posterior log-odds.
-- Local browser launch and interaction are still unverified. Automated checks do not fully substitute for checking the UI in a browser.
+- The user confirmed that the browser UI looked fine. The integration smoke test covers model/data output, but it does not automate full browser interaction.
 
 ## Remaining repository gaps
 
@@ -47,19 +47,6 @@ These results are conditional on one small fixed split and are not clinical vali
 - A fresh-clone installation and full verification have not been confirmed by the user.
 - Streamlit browser behavior and missing-feature interaction need manual verification.
 
-## Step 10 verification gate
+## Step 10 verification record\n\n```powershell\npython -m py_compile app.py\npython -m unittest discover -s tests -v\nstreamlit run app.py\n```\n\n- Syntax check: passed.\n- Unit and integration tests: 25 passed, 0 failures/errors, in 0.445 seconds.\n- Streamlit server: started at `http://localhost:8501`; the user reported that the browser UI looked fine.\n- Two non-fatal deprecation warnings recommend replacing `use_container_width=True` with `width="stretch"`.\n\n## Current conclusion
 
-After pulling latest main, run:
-
-```powershell
-git pull origin main
-python -m py_compile app.py
-python -m unittest discover -s tests -v
-streamlit run app.py
-```
-
-In the browser, confirm that the page loads, the inputs can be changed, the demonstration button displays probabilities and feature evidence, the Bayesian trace appears, and marking a predictor missing does not crash the app. Confirm the warning remains visible.
-
-## Current conclusion
-
-Steps 8 and 9 are verified. Step 10 is implemented but remains pending the 25-test suite and manual Streamlit browser check. Review the user's output, fix any failures, update the README/report, and verify the latest GitHub Actions result before closing Step 10.
+Steps 8, 9, and 10 are verified locally. Remaining maintenance items are dependency pinning, choosing a source-code license, confirming a fresh-clone setup, checking the latest GitHub Actions run, and replacing the deprecated Streamlit width arguments. None of the observed warnings blocked local tests or app launch.
