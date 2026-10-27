@@ -1,0 +1,21 @@
+# Python bytecode and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Local virtual environments
+.venv/
+venv/
+env/
+
+# Generated exploratory outputs (reproducible from scripts)
+reports/eda/*.csv
+reports/eda/*.png
+reports/distribution_fitting/*.csv
+reports/distribution_fitting/*.png
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.vscode/
