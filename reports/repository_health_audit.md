@@ -38,13 +38,13 @@ These results are conditional on one small fixed split and are not clinical vali
 - The app trains on the full 303-row dataset for interactive demonstration. Its output is not a held-out prediction; this is stated in the UI and README.
 - The UI warns users not to enter real patient information and not to use results for diagnosis or patient care.
 - The workflow checks `python -m py_compile app.py`; the new integration smoke test exercises the data/model interface and checks that feature contributions reconstruct posterior log-odds.
-- The user confirmed that the browser UI looked fine in the original environment. The integration smoke test covers model/data output, but it does not automate full browser interaction. The clean-clone test failure is being addressed by copying the NumPy row before mutation; verification remains pending.
+- The user confirmed that the browser UI looked fine in the original environment. The integration smoke test covers model/data output, but it does not automate full browser interaction. The clean-clone test issue was fixed by copying the NumPy row before mutation; a fresh clone then passed `py_compile` and all 25 tests.
 
 ## Remaining repository gaps
 
 - `requirements.txt` specifies minimum versions rather than a fully locked environment.
 - No `LICENSE` file declares reuse permissions for project source code; the dataset license does not automatically license the code.
-- Fresh-clone installation succeeded, but full verification did not: 24 tests passed and the Streamlit integration test errored because its NumPy row was read-only. A `.copy()` fix has been pushed; the user must rerun the clean-clone suite to confirm.
+- Fresh-clone verification is now complete: after pulling the `.copy()` fix, `py_compile` passed and all 25 tests passed in 0.553 seconds under newer dependencies.
 - Streamlit browser behavior and missing-feature interaction need manual verification.
 
 ## Step 10 verification record\n\n```powershell\npython -m py_compile app.py\npython -m unittest discover -s tests -v\nstreamlit run app.py\n```\n\n- Syntax check: passed.\n- Unit and integration tests: 25 passed, 0 failures/errors, in 0.445 seconds.\n- Streamlit server: started at `http://localhost:8501`; the user reported that the browser UI looked fine.\n- Two non-fatal deprecation warnings recommend replacing `use_container_width=True` with `width="stretch"`.\n\n## Current conclusion
