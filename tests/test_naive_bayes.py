@@ -27,6 +27,19 @@ class TestHybridNaiveBayes(unittest.TestCase):
         predicted = self.model.predict(np.array([[1.0, 0.0], [5.0, 1.0]]))
         np.testing.assert_array_equal(predicted, np.array([0, 1]))
 
+    def test_posterior_progression_ends_at_predict_proba(self):
+        samples = np.array([[1.0, 0.0], [5.0, 1.0], [np.nan, np.nan]])
+        progression = self.model.predict_proba_progression(samples)
+        self.assertEqual(progression.shape, (3, 3, 2))
+        np.testing.assert_allclose(progression[:, -1, :], self.model.predict_proba(samples))
+        np.testing.assert_allclose(progression[:, 0, :], np.tile([0.5, 0.5], (3, 1)))
+        np.testing.assert_allclose(progression[2, :, :], np.tile([0.5, 0.5], (3, 1)))
+
+    def test_progression_before_fit_is_rejected(self):
+        model = HybridNaiveBayes((0,), (1,))
+        with self.assertRaisesRegex(RuntimeError, "Call fit before predict_proba_progression"):
+            model.predict_proba_progression(self.X)
+
     def test_posteriors_are_normalized_and_finite(self):
         probabilities = self.model.predict_proba(self.X)
         self.assertTrue(np.isfinite(probabilities).all())
