@@ -25,9 +25,41 @@ git pull origin main
 python scripts/evaluate_model.py
 ```
 
-## Results status
+## User-confirmed results
 
-The evaluation script has been committed but has not yet been run in the user's environment. No performance numbers are claimed in this report until the command output is reviewed.
+The user ran `python scripts/evaluate_model.py` locally after the 11-test suite passed.
+
+| Metric | Held-out result |
+|---|---:|
+| Accuracy | 0.8816 |
+| Precision (class 1) | 0.8250 |
+| Recall (class 1) | 0.9429 |
+| F1 (class 1) | 0.8800 |
+| ROC-AUC | 0.9742 |
+| Brier score | 0.0798 |
+
+Confusion matrix (rows = actual classes 0/1, columns = predicted classes 0/1):
+
+| Actual / Predicted | 0 | 1 |
+|---|---:|---:|
+| 0 | 34 | 7 |
+| 1 | 2 | 33 |
+
+The five calibration bins printed by the user's run were:
+
+| Mean predicted probability | Observed fraction positive |
+|---:|---:|
+| 0.0025 | 0.0000 |
+| 0.0761 | 0.0000 |
+| 0.6273 | 0.4667 |
+| 0.9834 | 0.8667 |
+| 0.9995 | 1.0000 |
+
+## Interpretation
+
+On this fixed split, the classifier identified 33 of 35 positive held-out rows and 34 of 41 negative rows. Its ROC-AUC indicates strong ranking on this split, but the sample is small and only one split was evaluated. In the 0.9834 mean-probability bin, the observed positive fraction was 0.8667, suggesting some overconfidence in that region. Calibration bins are noisy with 76 test cases; do not overinterpret individual bins.
+
+The reported metrics are one-split exploratory results, not a clinical claim. Before stronger conclusions, use repeated stratified cross-validation or bootstrap intervals, compare against a simple baseline, and assess calibration more robustly. The Brier score is recorded as a probability-error metric; it has not yet been compared with a prevalence-only baseline.
 
 ## Interpretation limits
 
@@ -39,4 +71,4 @@ The evaluation script has been committed but has not yet been run in the user's 
 
 ## Step 6 completion gate
 
-Run the script locally, inspect the complete output and generated report/plots, and share the results. If any errors occur, fix them before proceeding to Step 7.
+Step 6 runtime checks passed: the user's 11-test suite passed and the evaluation script completed. The results above are recorded. Step 7 can proceed with the sequential Bayesian updating demonstration.
