@@ -1,50 +1,57 @@
-# Repository health, bug, and code audit
+# Repository health audit
 
 **Audit date:** 2026-10-28  
-**Repository:** [BethalaRinosh/BayesPulse](https://github.com/BethalaRinosh/BayesPulse)  
-**Scope:** Model implementation, tests, analysis scripts, Streamlit app, dependencies, documentation, dataset provenance, CI, and repository hygiene.
+**Scope:** project requirements, repository structure, model implementation, API, React frontend, tests, dependency management, CI, documentation, and licensing.
 
-## Executive result
+## Summary
 
-- **Step 8 passed:** the user ran 20 tests and the feature-contribution demo; the contribution sum reconstructed posterior log-odds.
-- **Step 9 passed:** the user ran 24 tests, the GaussianNB equivalence comparison printed PASS, and the uncertainty/QDA analysis completed. GitHub Actions passed for the Step 9 commit series.
-- **Step 10 and clean-clone verification passed:** `app.py` compiled, all 25 tests passed in the original environment, and Streamlit launched with the user confirming the UI looked fine. A fresh clone with newer dependency versions initially exposed a read-only NumPy array in test setup. The test row now uses `.copy()` before mutation, and the user reran the clean-clone checks successfully: `py_compile` passed and all 25 tests passed in 0.553 seconds. Non-fatal Streamlit cache/script-context warnings appeared in bare test mode; the user's app run also emitted a `use_container_width` deprecation warning.
+BayesPulse implements the core probability/statistics requirements and the user has confirmed the API checks, 33 Python unit tests, and the initial React production build passed. The React UI is connected to the FastAPI adapter, and the original Streamlit interface and NumPy classifier are retained.
 
-## Previously identified defects and fixes
+The repository is **not yet at a fully verified release state**. The frontend build was added to GitHub Actions during this audit, but that workflow run has not completed at the time this report was written. The following maintenance gaps remain open.
 
-1. Categorical smoothing now includes a shared OTHER bucket in the denominator so known categories plus OTHER form a normalized distribution.
-2. `alpha` and `variance_smoothing` must be finite and satisfy their sign constraints.
-3. Non-integer and boolean feature indices are rejected.
-4. Fitting rejects continuous features with no observed values in one class.
-5. A failed refit cannot leave the model marked fitted.
-6. Distribution diagnostics reject missing/invalid targets, entirely missing predictor columns, and empty per-class groups.
-7. README and stage reports distinguish verified results from pending work and state the educational-only scope.
+## Requirements review
 
-## Step 9 verification record
+- Cleveland UCI dataset with 303 records and a binary target `num > 0`: implemented.
+- From-scratch hybrid Naive Bayes with Gaussian continuous likelihoods and smoothed categorical likelihoods: implemented in `bayespulse/naive_bayes.py`.
+- Log-space posterior normalization and missing-predictor support: implemented and unit-tested.
+- GaussianNB equivalence validation: implemented by `scripts/validate_against_sklearn.py`; the user previously confirmed it passed.
+- Held-out evaluation, calibration diagnostics, bootstrap intervals, decision-cost sensitivity, dependence diagnostics, and QDA comparison: implemented as analysis scripts.
+- Feature evidence and sequential posterior progression: exposed through the model, Streamlit app, FastAPI API, and React UI.
+- Educational-only health disclaimer and full-dataset interactive-model limitation: documented in the interfaces and README.
+- React + TypeScript frontend and FastAPI API: implemented. User confirmed the initial frontend production build and the API prediction endpoint worked.
+- Automated frontend build in CI: added in commit `61ea0b4583410717ecff96ec77cd12c55aa5ffef`; the run is pending/in progress and is not yet recorded as passing.
 
-- 24 tests passed in 0.464 seconds.
-- GaussianNB comparison passed: priors matched; maximum fitted mean/variance difference was 2.842e-13; maximum held-out probability difference was 3.109e-15; predictions matched.
-- The uncertainty analysis completed on 227 training rows and 76 held-out rows with 2,000 bootstrap replicates.
-- Hybrid Naive Bayes point metrics: accuracy 0.8816, class-1 recall 0.9429, ROC-AUC 0.9742, Brier score 0.0796.
-- QDA comparator point metrics: accuracy 0.8947, class-1 recall 0.9143, ROC-AUC 0.9519, Brier score 0.0949.
-- Hybrid Naive Bayes bootstrap 95% intervals: accuracy [0.8026, 0.9474], class-1 recall [0.8571, 1.0000], ROC-AUC [0.9394, 0.9951], Brier score [0.0393, 0.1268].
-- GitHub Actions passed for the Step 9 commit `9d55ca5fd16f6ff77a56fc5e5c90a85165ae7b58`.
+## Findings and remaining work
 
-These results are conditional on one small fixed split and are not clinical validation.
+1. **Frontend lockfile missing.** `frontend/package-lock.json` is not committed. `npm install` works, but a fresh install can resolve newer transitive versions over time. Generate and commit the lockfile from a network-enabled local checkout, then use `npm ci` in CI.
+2. **Source-code license undecided.** No root `LICENSE` exists. The README now states this clearly. Do not assume the dataset's license grants reuse rights to this project's code. The user must choose the intended project-code license before one is added.
+3. **Frontend automated tests are absent.** The frontend currently has a TypeScript/production-build check in CI, but no React component or browser end-to-end tests. The existing Python tests cover model, API, analysis helpers, and Streamlit model/data integration.
+4. **Python dependencies are minimum-version ranges, not a lockfile.** The build has emitted a Starlette/TestClient deprecation warning around HTTPX in the local environment. It did not fail the previously reported test run, but the environment should be pinned and the warning resolved after checking compatible FastAPI/Starlette/http client versions.
+5. **Step-named reports remain.** They contain scientific methodology and historical verification records, but some also contain dated workflow notes. Because the full repository verification is not yet green and the source license is unresolved, they have not been deleted during this audit. Once the open checks are resolved, consolidate useful scientific content into durable methodology/evaluation documentation and remove process logs.
+6. **Latest frontend style revision needs a fresh production build.** The user previously confirmed the initial React build. Subsequent styling-only changes should be covered by the newly added CI frontend build.
 
-## Step 10 implementation review
+## Scientific evaluation snapshot
 
-- `app.py` exposes continuous inputs, categorical-coded dropdowns, optional missing predictors, posterior probabilities, per-feature log-likelihood ratios, and a Bayesian updating trace.
-- The app trains on the full 303-row dataset for interactive demonstration. Its output is not a held-out prediction; this is stated in the UI and README.
-- The UI warns users not to enter real patient information and not to use results for diagnosis or patient care.
-- The workflow checks `python -m py_compile app.py`; the new integration smoke test exercises the data/model interface and checks that feature contributions reconstruct posterior log-odds.
-- The user confirmed that the browser UI looked fine in the original environment. The integration smoke test covers model/data output, but it does not automate full browser interaction. The clean-clone test issue was fixed by copying the NumPy row before mutation; a fresh clone then passed `py_compile` and all 25 tests.
+The recorded fixed stratified split uses 227 training records and 76 held-out records (seed 42). Hybrid Naive Bayes metrics at threshold 0.5 were:
 
-## Remaining repository gaps
+| Metric | Result |
+|---|---:|
+| Accuracy | 0.8816 |
+| Class-1 precision | 0.8250 |
+| Class-1 recall | 0.9429 |
+| Class-1 F1 | 0.8800 |
+| ROC-AUC | 0.9742 |
+| Brier score | 0.0796 |
 
-- `requirements.txt` specifies minimum versions rather than a fully locked environment.
-- No `LICENSE` file declares reuse permissions for project source code; the dataset license does not automatically license the code.
-- Fresh-clone verification is now complete: after pulling the `.copy()` fix, `py_compile` passed and all 25 tests passed in 0.553 seconds under newer dependencies.
-- Streamlit browser behavior and missing-feature interaction need manual verification.
+The QDA comparator had slightly higher accuracy on that split (0.8947), while hybrid Naive Bayes had higher class-1 recall (0.9429 vs 0.9143), higher ROC-AUC (0.9742 vs 0.9519), and lower Brier score (0.0796 vs 0.0949). These are single-split results on a small historical dataset and do not establish clinical validity or real-world generalization.
 
-## Step 10 verification record\n\n```powershell\npython -m py_compile app.py\npython -m unittest discover -s tests -v\nstreamlit run app.py\n```\n\n- Original environment: syntax check passed, 25 tests passed, Streamlit started at `http://localhost:8501`, and the user reported that the UI looked fine.\n- Fresh clone with newer dependencies: syntax check passed and all 25 tests passed in 0.553 seconds after fixing the read-only test array.\n- Bare test mode produced non-fatal Streamlit cache/script-context warnings. The app run also emitted a deprecation warning for `use_container_width`.\n\n## Current conclusion\n\nSteps 8, 9, 10, and clean-clone verification are complete. Remaining maintenance items include dependency pinning, choosing a source-code license, checking the latest GitHub Actions run, and replacing deprecated Streamlit width arguments.\n
+## Repository hygiene updates made during this audit
+
+- Rewrote the root README as project documentation, removing the step-by-step development narrative and adding setup, API, tests, evaluation, limitations, and licensing status.
+- Added ignores for `frontend/node_modules/`, `frontend/dist/`, and local frontend environment files.
+- Added Node.js setup, dependency installation, and `npm run build` to the GitHub Actions workflow.
+- Kept the Streamlit interface and classifier implementation unchanged.
+
+## Release gate
+
+Do not describe the repository as fully verified until the latest GitHub Actions run passes, the frontend lockfile is committed, the local frontend build is repeated after the latest style update, and the project-code license decision is made. No clinical deployment or medical use is appropriate.
