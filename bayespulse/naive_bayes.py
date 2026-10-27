@@ -174,6 +174,69 @@ class HybridNaiveBayes:
         log_normalizer = row_max + np.log(np.sum(np.exp(joint - row_max), axis=1, keepdims=True))
         return joint - log_normalizer
 
+    def predict_proba_progression(self, X: np.ndarray) -> np.ndarray:
+        """Return posterior probabilities after each feature is observed.
+
+        The result has shape (n_samples, n_steps, n_classes). Step zero contains
+        class priors before observing any features. Subsequent steps follow
+        continuous_features then categorical_features, matching the model's
+        likelihood assumptions. Missing values leave that step's posterior
+        unchanged. This is a teaching aid for sequential Bayesian updating.
+        """
+        if not self._fitted:
+            raise RuntimeError("Call fit before predict_proba_progression.")
+        X = self._as_matrix(X)
+        if X.shape[1] != self.n_features_in_:
+            raise ValueError(
+                f"X has {X.shape[1]} features; model was fitted with {self.n_features_in_}."
+            )
+
+        ordered_features = self.continuous_features + self.categorical_features
+        joint = np.tile(self.class_log_prior_, (X.shape[0], 1))
+        snapshots = [self._normalize_log_scores(joint)]
+
+        for feature_index in ordered_features:
+            values = X[:, feature_index]
+            observed_mask = np.isfinite(values)
+            if observed_mask.any():
+                for class_pos in range(len(self.classes_)):
+                    if feature_index in self.continuous_features:
+                        means, variances = self.gaussian_params_[class_pos]
+                        if not np.isfinite(means[feature_index]):
+                            continue
+                        observed_values = values[observed_mask]
+                        variance = variances[feature_index]
+                        log_likelihood = -0.5 * (
+                            np.log(2.0 * np.pi * variance)
+                            + ((observed_values - means[feature_index]) ** 2 / variance)
+                        )
+                        joint[observed_mask, class_pos] += log_likelihood
+                    else:
+                        categories = self.category_values_[feature_index]
+                        for row_index in np.flatnonzero(observed_mask):
+                            matches = np.flatnonzero(categories == values[row_index])
+                            if matches.size:
+                                log_likelihood = self.category_log_probs_[feature_index][
+                                    class_pos, matches[0]
+                                ]
+                            else:
+                                log_likelihood = self.category_unknown_log_probs_[
+                                    feature_index
+                                ][class_pos]
+                            joint[row_index, class_pos] += log_likelihood
+            snapshots.append(self._normalize_log_scores(joint))
+
+        return np.stack(snapshots, axis=1)
+
+    @staticmethod
+    def _normalize_log_scores(joint: np.ndarray) -> np.ndarray:
+        """Normalize unnormalized class log scores with log-sum-exp."""
+        row_max = np.max(joint, axis=1, keepdims=True)
+        log_normalizer = row_max + np.log(
+            np.sum(np.exp(joint - row_max), axis=1, keepdims=True)
+        )
+        return np.exp(joint - log_normalizer)
+
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         """Return posterior probabilities in the order of classes_."""
         return np.exp(self.predict_log_proba(X))
