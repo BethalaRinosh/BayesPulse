@@ -7,7 +7,7 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 
 ## Project status
 
-- **Current stage:** Step 5 in progress — GaussianNB comparison harness added; user-provided runtime output exposed and led to a fix for prediction-before-fit handling. Rerun checks are pending.
+- **Current stage:** Step 5 in progress — all 11 unit tests pass in the user's environment. The GaussianNB comparison script's package import path was fixed; rerun the comparison to confirm numerical parity.
 - **Dataset selected:** UCI Heart Disease, Cleveland subset.
 - **Implementation status:** Dataset EDA, distribution diagnostics, and a from-scratch hybrid Naive Bayes classifier are present. The classifier uses Gaussian likelihoods for continuous features and Laplace-smoothed categorical likelihoods for discrete-coded features.
 - **Repository audit:** The repository was empty when inspected. The README, dataset, EDA script, and Step 2 report now establish the project baseline; no existing project files were overwritten or removed.
@@ -18,7 +18,7 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 2. Explore data quality, class balance, feature types, and summary statistics.
 3. Fit and diagnose per-class feature distributions. Assess Gaussian assumptions with histograms, Q-Q plots, and Shapiro-Wilk tests where appropriate; consider log-normal or KDE alternatives when justified. Use Bernoulli/categorical probabilities with Laplace smoothing for discrete features.
 4. Implement Naive Bayes from scratch in NumPy using class priors, Gaussian continuous-feature likelihoods, Laplace-smoothed categorical likelihoods, and normalized log-space posteriors. (Implemented; see `bayespulse/naive_bayes.py`.)
-5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies. (Comparison harness added; execution result pending.)
+5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies. (11 unit tests pass; numerical comparison rerun is pending after a Windows import-path fix.)
 6. Evaluate on a proper held-out split or cross-validation using confusion matrix, precision, recall, F1, ROC-AUC, and a calibration curve.
 7. Add a feature-by-feature Bayesian updating demonstration.
 8. Add interpretable per-feature log-likelihood ratios.
