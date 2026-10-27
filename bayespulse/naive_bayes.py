@@ -35,14 +35,23 @@ class HybridNaiveBayes:
         alpha: float = 1.0,
         variance_smoothing: float = 1e-9,
     ) -> None:
-        self.continuous_features = tuple(continuous_features)
-        self.categorical_features = tuple(categorical_features)
+        continuous_features = tuple(continuous_features)
+        categorical_features = tuple(categorical_features)
+        all_indices = continuous_features + categorical_features
+        if any(
+            not isinstance(index, (int, np.integer))
+            or isinstance(index, (bool, np.bool_))
+            for index in all_indices
+        ):
+            raise ValueError("Feature indices must be integers.")
+        self.continuous_features = tuple(int(index) for index in continuous_features)
+        self.categorical_features = tuple(int(index) for index in categorical_features)
         self.alpha = float(alpha)
         self.variance_smoothing = float(variance_smoothing)
-        if self.alpha <= 0:
-            raise ValueError("alpha must be greater than zero.")
-        if self.variance_smoothing < 0:
-            raise ValueError("variance_smoothing must be non-negative.")
+        if not np.isfinite(self.alpha) or self.alpha <= 0:
+            raise ValueError("alpha must be finite and greater than zero.")
+        if not np.isfinite(self.variance_smoothing) or self.variance_smoothing < 0:
+            raise ValueError("variance_smoothing must be finite and non-negative.")
         if set(self.continuous_features) & set(self.categorical_features):
             raise ValueError("A feature cannot be both continuous and categorical.")
         self._fitted = False
@@ -80,6 +89,13 @@ class HybridNaiveBayes:
         self.classes_, class_counts = np.unique(y, return_counts=True)
         if self.classes_.size < 2:
             raise ValueError("At least two distinct classes are required for classification.")
+        for class_value in self.classes_:
+            class_mask = y == class_value
+            for j in self.continuous_features:
+                if not np.isfinite(X[class_mask, j]).any():
+                    raise ValueError(
+                        f"Continuous feature {j} has no observed values in class {class_value}."
+                    )
         self.class_log_prior_ = np.log(class_counts / class_counts.sum())
         self.n_features_in_ = n_features
         self.gaussian_params_: dict[int, tuple[np.ndarray, np.ndarray]] = {}
@@ -117,7 +133,10 @@ class HybridNaiveBayes:
             for class_pos, class_value in enumerate(self.classes_):
                 values = X[y == class_value, j]
                 values = values[np.isfinite(values)]
-                denominator = values.size + self.alpha * categories.size
+                # Treat every unseen category code as one shared OTHER bucket.
+                # Including that bucket in K keeps the smoothed categorical
+                # probabilities normalized over known categories plus OTHER.
+                denominator = values.size + self.alpha * (categories.size + 1)
                 for category_pos, category in enumerate(categories):
                     count = np.count_nonzero(values == category)
                     log_probs[class_pos, category_pos] = np.log(
