@@ -24,8 +24,8 @@ No unrelated project files were deleted. There is no app, trained model artifact
 - Repository tree retrieved successfully and reported `truncated: false`.
 - Dataset text inspected: 304 lines including the header, 13 predictor columns plus `num`, and `?` missing-value markers are present.
 - Classifier and tests fetched back from GitHub after creation.
-- A local logic-level smoke test passed for empirical priors, separated synthetic classes, normalized finite posterior probabilities, all-feature-missing prior fallback, unseen-category smoothing, constant continuous features, and invalid overlapping feature indices. A targeted check also confirmed numeric NaN target detection.
-- A clean clone and the exact repository test command could not be executed because this environment cannot resolve `github.com` for a direct clone. Therefore the smoke test is useful but is **not** a substitute for running the committed unit-test file in the user's local checkout.
+- A local logic-level smoke test passed for empirical priors, separated synthetic classes, normalized finite posterior probabilities, all-feature-missing prior fallback, unseen-category smoothing, constant continuous features, and invalid overlapping feature indices. The user's actual run confirmed the EDA and distribution scripts complete, but exposed the prediction-before-fit bug fixed in Step 5.
+- The user ran the repository test command locally. It executed 9 tests with 1 error: prediction-before-fit raised AttributeError instead of the intended RuntimeError. The user also ran both data scripts successfully. The prediction guard and test expectation have since been fixed; rerunning the suite is still required to confirm the fix.
 
 ## Issues found and fixed
 
@@ -54,3 +54,8 @@ python scripts/fit_distributions.py
 ```
 
 Review the test output and generated reports before using any diagnostic findings. Step 5 has not been started.
+
+
+## Follow-up after user-provided runtime output
+
+The user ran dependency installation, the unit suite, EDA, and distribution diagnostics. Installation was already satisfied; EDA and distribution diagnostics completed. The test suite had one failure in prediction-before-fit handling. Step 5 fixed the ordering in `predict()` and strengthened the test. The unit suite must be rerun to confirm the fix, and the new GaussianNB comparison script must be executed to obtain its actual numeric comparison.
