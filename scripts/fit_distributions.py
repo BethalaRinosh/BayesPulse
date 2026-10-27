@@ -83,6 +83,10 @@ def main() -> None:
         raise ValueError(f"Dataset is missing columns: {sorted(missing_columns)}")
     if len(df) != 303:
         raise ValueError(f"Expected 303 records; found {len(df)}.")
+    if df["num"].isna().any():
+        raise ValueError("The target column 'num' contains missing labels.")
+    if not set(df["num"].unique()).issubset({0, 1, 2, 3, 4}):
+        raise ValueError("The target column 'num' contains unexpected values.")
     df[TARGET] = (df["num"] > 0).astype(int)
 
     # Continuous-feature fitting is performed separately within each class.
