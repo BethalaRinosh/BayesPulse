@@ -8,11 +8,12 @@ BayesPulse is an educational Probability & Statistics project that implements a 
 
 ## Current status
 
-- The NumPy hybrid Naive Bayes classifier, dataset diagnostics, GaussianNB equivalence check, held-out evaluation, sequential Bayesian updating, and per-feature log-odds explanation are implemented.
-- **Step 8 verification passed locally:** all 20 unit tests passed, and the feature-contribution demo completed successfully. The contributions reconstruct the final posterior log-odds. See `reports/step8_feature_contributions.md`.
-- **Step 9 implementation is pushed but awaiting verification:** bootstrap intervals, illustrative decision-cost threshold analysis, feature-dependence diagnostics, and a quadratic discriminant analysis (QDA) comparator are included in `scripts/uncertainty_decision_analysis.py`. Four helper tests were added, bringing the expected unit-test count to 24.
-- The Step 9 workflow is now included in GitHub Actions. Its result for the latest commit must be checked before claiming the new analysis passes.
-- There is no Streamlit app yet. The repository has no declared license for the project source code; the dataset's license does not automatically license the code.
+- The NumPy hybrid Naive Bayes classifier, dataset diagnostics, GaussianNB equivalence check, held-out evaluation, sequential Bayesian updating, per-feature log-odds explanation, and uncertainty/dependence/model-comparison analysis are implemented.
+- **Step 8 verified:** 20 unit tests passed; the contribution sum reconstructed posterior log-odds.
+- **Step 9 verified:** 24 unit tests passed; GaussianNB equivalence validation passed; uncertainty and QDA analysis completed; GitHub Actions passed. Results are documented in `reports/step9_uncertainty_decision_analysis.md`.
+- **Step 10 app implementation is pushed and awaiting local UI verification:** `app.py` provides an interactive Streamlit demonstration with feature inputs, modelled posterior probabilities, per-feature log-likelihood ratios, and a Bayesian updating trace.
+- The app fits on the full dataset for an educational interactive demonstration. Its displayed probabilities are not held-out test predictions, clinical risk estimates, or evidence of generalization.
+- The project source-code license has not been selected. The dataset's license does not automatically license this repository's source code.
 
 ## What it does
 
@@ -21,10 +22,11 @@ BayesPulse is an educational Probability & Statistics project that implements a 
 - Models discrete-coded predictors with Laplace-smoothed categorical likelihoods.
 - Handles missing predictors by skipping their likelihood contribution rather than silently converting missing values to zero.
 - Normalizes posterior calculations in log space.
-- Exposes feature-by-feature posterior updates for an educational demonstration.
+- Exposes feature-by-feature posterior updates.
 - Decomposes binary posterior log-odds into prior odds and per-feature log-likelihood ratios.
 - Compares the continuous-only implementation with scikit-learn's `GaussianNB`.
 - Reports held-out metrics, calibration diagnostics, bootstrap intervals, decision-cost sensitivity, feature-dependence measures, and a QDA comparator.
+- Provides an interactive educational interface through Streamlit.
 
 ## Dataset and target
 
@@ -43,7 +45,8 @@ This is a small historical dataset. It does not represent all current population
 BayesPulse/
 ├── .github/
 │   └── workflows/
-│       └── verify.yml               # Automated tests and analysis scripts
+│       └── verify.yml               # Automated tests and script checks
+├── app.py                           # Streamlit educational interface
 ├── bayespulse/
 │   └── naive_bayes.py               # NumPy-only hybrid Naive Bayes estimator
 ├── data/
@@ -58,6 +61,7 @@ BayesPulse/
 │   ├── step7_bayesian_updating.md
 │   ├── step8_feature_contributions.md
 │   ├── step9_uncertainty_decision_analysis.md
+│   ├── step10_streamlit_app.md
 │   └── repository_health_audit.md
 ├── scripts/
 │   ├── explore_dataset.py
@@ -90,12 +94,25 @@ python -m pip install -r requirements.txt
 
 If PowerShell blocks activation, use the Python executable directly at `.venv\Scripts\python.exe` or follow your local Python environment policy.
 
-## Verification and run commands
+## Launch the interactive app
+
+From the repository root:
+
+```powershell
+streamlit run app.py
+```
+
+The app lets you enter a hypothetical record, inspect the modelled class probabilities, review feature log-likelihood ratios, and see how the posterior changes as features are incorporated. It uses original coded categorical values and labels them where practical.
+
+**Privacy and safety:** Do not enter real patient information. The app is for coursework and model interpretation only. It trains the demonstration model on the full 303-row dataset, so its interactive output is not an independent held-out prediction.
+
+## Verification and analysis commands
 
 Run these from the repository root after pulling the latest `main`:
 
 ```powershell
 git pull origin main
+python -m py_compile app.py
 python -m unittest discover -s tests -v
 python scripts/explore_dataset.py
 python scripts/fit_distributions.py
@@ -106,9 +123,27 @@ python scripts/feature_contributions_demo.py
 python scripts/uncertainty_decision_analysis.py
 ```
 
-**Latest confirmed Step 8 result:** 20 unit tests passed in 0.047 seconds. The feature-contribution demo ran on the deterministic split (227 training rows, 76 held-out rows), reconstructed total log-odds of `-1.645294`, and returned `P(class 1) = 0.161746` for held-out row index 256. Its predicted class was 0, matching the retrospective dataset label. GitHub Actions passed for the Step 8 commit `f19b051`.
+### Step 9 confirmed results
 
-**Step 9 is awaiting verification.** The expected suite count is 24 tests. Review the QDA fit, bootstrap intervals, threshold-cost table, dependence measures, and generated report before treating the step as complete.
+The user ran the 24-test suite successfully in 0.464 seconds, the GaussianNB comparison printed PASS, and the uncertainty analysis completed on 227 training rows and 76 held-out rows using 2,000 bootstrap replicates. GitHub Actions also passed for the Step 9 commit.
+
+| Metric | Hybrid Naive Bayes | QDA comparator |
+|---|---:|---:|
+| Accuracy at threshold 0.5 | 0.8816 | 0.8947 |
+| Class-1 recall | 0.9429 | 0.9143 |
+| ROC-AUC | 0.9742 | 0.9519 |
+| Brier score | 0.0796 | 0.0949 |
+
+Hybrid Naive Bayes bootstrap percentile 95% intervals, conditional on the fixed test partition:
+
+| Metric | Bootstrap median | 95% interval |
+|---|---:|---:|
+| Accuracy | 0.8816 | [0.8026, 0.9474] |
+| Class-1 recall | 0.9429 | [0.8571, 1.0000] |
+| ROC-AUC | 0.9763 | [0.9394, 0.9951] |
+| Brier score | 0.0776 | [0.0393, 0.1268] |
+
+These metrics do not establish clinical validity. QDA has slightly higher accuracy at the default threshold, while hybrid Naive Bayes has higher recall and ROC-AUC and lower Brier score on this one split.
 
 ### What the scripts generate
 
@@ -118,7 +153,7 @@ python scripts/uncertainty_decision_analysis.py
 - `evaluate_model.py`: held-out metrics, calibration table, and ROC/confusion-matrix/calibration plots in `reports/evaluation/`.
 - `bayesian_updating_demo.py`: a deterministic held-out sample's posterior after each feature is incorporated.
 - `feature_contributions_demo.py`: prior log-odds and each held-out feature's log-likelihood ratio.
-- `uncertainty_decision_analysis.py`: class-stratified bootstrap intervals, an illustrative error-cost threshold sweep, continuous/categorical dependence diagnostics, mutual information, and a QDA comparison. It writes `reports/evaluation/step9_uncertainty_decision_analysis.md`.
+- `uncertainty_decision_analysis.py`: bootstrap intervals, illustrative error-cost threshold sweep, dependence diagnostics, mutual information, and QDA comparison. It writes a generated report under `reports/evaluation/`.
 
 Generated diagnostic outputs are ignored by Git and can be recreated by rerunning the scripts.
 
@@ -150,7 +185,7 @@ The feature indices are examples only. Supply the correct indices for your datas
 - Bootstrap intervals in Step 9 are conditional on the fixed held-out partition. They do not include uncertainty from retraining or a new sample.
 - Step 9's false-negative and false-positive costs are illustrative placeholders, not clinically or economically validated values. No threshold is recommended for medical use.
 - QDA is a comparator with different assumptions and preprocessing; a single split does not establish which model generalizes better.
-- The current evaluation uses one split of a small dataset. Metrics and calibration bins can vary substantially with the split.
+- The Streamlit app fits on the full dataset for demonstration. Its output is not a held-out prediction and must not be used for patient-care decisions.
 - No clinical validation, external validation, clinical threshold selection, or deployment safety evaluation has been performed.
 
 ## References and licensing
