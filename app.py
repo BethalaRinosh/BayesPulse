@@ -153,7 +153,7 @@ def main() -> None:
         class_one_position = int(np.flatnonzero(model.classes_ == 1)[0])
         probability = float(posterior[class_one_position])
         explanation = model.explain_log_odds(row, positive_class=1)
-        contributions = np.asarray(explanation["contributions"], dtype=float)[0]
+        contributions = np.asarray(explanation["feature_log_likelihood_ratios"], dtype=float)[0]
         feature_indices = tuple(explanation["feature_indices"])
         evidence_names = [FEATURES[index] for index in feature_indices]
         prior_log_odds = float(explanation["prior_log_odds"])
