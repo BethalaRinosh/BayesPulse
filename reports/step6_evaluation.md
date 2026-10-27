@@ -25,13 +25,9 @@ git pull origin main
 python scripts/evaluate_model.py
 ```
 
-## Historical results from the pre-audit implementation
+## User-confirmed results after repository health fixes
 
-**These values are retained as historical evidence, not as the current implementation's results.** The repository health audit changed categorical smoothing by adding an explicit smoothed `OTHER` bucket for unseen category codes. This can change posterior probabilities and held-out metrics. Re-run `python scripts/evaluate_model.py` after pulling the audit fixes, then replace this section with the new user-confirmed output.
-
-## User-confirmed results
-
-The user ran `python scripts/evaluate_model.py` locally after the 11-test suite passed.
+The user ran `python scripts/evaluate_model.py` after pulling the audit changes. The script completed successfully with the following updated results.
 
 | Metric | Held-out result |
 |---|---:|
@@ -40,7 +36,7 @@ The user ran `python scripts/evaluate_model.py` locally after the 11-test suite 
 | Recall (class 1) | 0.9429 |
 | F1 (class 1) | 0.8800 |
 | ROC-AUC | 0.9742 |
-| Brier score | 0.0798 |
+| Brier score | 0.0796 |
 
 Confusion matrix (rows = actual classes 0/1, columns = predicted classes 0/1):
 
@@ -54,9 +50,9 @@ The five calibration bins printed by the user's run were:
 | Mean predicted probability | Observed fraction positive |
 |---:|---:|
 | 0.0025 | 0.0000 |
-| 0.0761 | 0.0000 |
-| 0.6273 | 0.4667 |
-| 0.9834 | 0.8667 |
+| 0.0754 | 0.0000 |
+| 0.6250 | 0.4667 |
+| 0.9832 | 0.8667 |
 | 0.9995 | 1.0000 |
 
 ## Interpretation
@@ -73,6 +69,6 @@ The reported metrics are one-split exploratory results, not a clinical claim. Be
 - Naive Bayes assumes conditional independence given the class; correlated predictors can violate this assumption.
 - This dataset and evaluation are educational only. They do not establish clinical validity, safe thresholds, or suitability for patient care.
 
-## Current verification gate
+## Verification status
 
-The original evaluation run completed successfully, but it predates the repository health fixes. The updated evaluation script must be rerun before these metrics can be treated as results for the current model.
+The updated evaluation script completed successfully after the repository health fixes. The reported metrics above are the user's confirmed output for that revision.
