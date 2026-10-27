@@ -6,7 +6,7 @@
 
 ## Executive result
 
-The repository has a coherent small-project structure, and the submitted earlier local outputs verified the prior implementation's 13 tests and demo. A static code review found several edge cases worth fixing. The fixes below have been committed, but **they have not yet been executed locally**. Do not call the current revision fully verified until the commands in the verification gate pass.
+The repository has a coherent small-project structure, and the submitted earlier local outputs verified the prior implementation's 13 tests and demo. A static code review found several edge cases worth fixing. The user subsequently ran the verification gate after pulling the audit fixes: all 16 unit tests passed, the GaussianNB comparison printed PASS, and the EDA, distribution, evaluation, and Bayesian updating scripts all completed. The Step 8 feature-contribution changes were added after that run and are not covered by this result.
 
 ## Issues found and changes committed
 
@@ -21,7 +21,7 @@ The repository has a coherent small-project structure, and the submitted earlier
 ## Static review findings
 
 - The GitHub tree was retrieved with `truncated: false`; the tracked project contains the classifier, four analysis/demo scripts plus the distribution script, one unit-test module, dataset, requirements, and stage reports.
-- The submitted prior run showed 13 tests passing and the sequential demo completing. That run predates the fixes above and is not evidence for the latest commit.
+- The post-audit user run showed 16 tests passing and the sequential demo completing. Step 8 added new code and four tests after that run; its expanded test suite and new demo still require local verification.
 - The continuous-only GaussianNB comparison is a separate implementation check. It should be rerun after the current changes even though the Gaussian likelihood formula was not changed.
 - The evaluation script uses a fixed stratified 75/25 split and fits the model on training rows only. Its previously reported metrics are no longer current after the categorical smoothing change.
 - The distribution diagnostics are exploratory and do not automatically select a likelihood distribution for the classifier.
@@ -34,7 +34,7 @@ The repository has a coherent small-project structure, and the submitted earlier
 - A GitHub Actions workflow now runs the unit suite, GaussianNB comparison, and data/evaluation/demo scripts on pushes and pull requests to `main`. The workflow has been committed, but the Actions API currently shows no workflow runs; verify its first run before treating CI as operational.
 - No `LICENSE` file declares reuse permissions for BayesPulse's own source code. The dataset license does not automatically license the project's code. Choose a project-code license deliberately before inviting reuse.
 - No Streamlit app exists yet, although Streamlit is listed as a dependency for the planned future app.
-- A fresh-clone run has not been performed by this audit; code was reviewed from the current GitHub source and the user's prior local logs.
+- A fresh-clone run has not been performed. The user verified the post-audit source in their existing local checkout; a clean-environment reproduction is still outstanding.
 
 ## Required local verification gate
 
@@ -50,13 +50,14 @@ python scripts/evaluate_model.py
 python scripts/bayesian_updating_demo.py
 ```
 
-The updated unit suite is expected to contain **16 tests**, but this is an expectation, not a pass result. Check that:
+The post-audit suite was confirmed at **16 passing tests**. Step 8 adds four tests, so the current expected count is 20. After pulling the latest `main`, check that:
 - all tests pass;
 - GaussianNB comparison prints `PASS`;
 - the evaluation script finishes and writes the report/plots;
 - the demo finishes and its final posterior sums to 1;
-- the new Step 6 metrics and Step 7 trace are captured and then written back to their reports.
+- Step 6 metrics and the Step 7 trace match the latest user-confirmed reports;
+- Step 8's log-odds contributions reconstruct the model posterior odds.
 
 ## Current conclusion
 
-The identified code-level edge cases have been patched and regression tests added. The repository is **improved but awaiting local revalidation**. A remote source review cannot truthfully certify that every runtime path is perfect; the verification gate is the remaining acceptance criterion.
+The repository health fixes have passed local verification. Step 8 feature-contribution code is now committed but awaiting its own test/demo run. A remote source review cannot certify every runtime path; the new verification gate remains the acceptance criterion for Step 8.
