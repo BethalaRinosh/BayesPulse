@@ -2,43 +2,49 @@
 
 **Audit date:** 2026-10-28  
 **Repository:** [BethalaRinosh/BayesPulse](https://github.com/BethalaRinosh/BayesPulse)  
-**Scope:** Current tracked tree, model implementation, tests, analysis scripts, dependencies, documentation consistency, dataset shape/provenance notes, and repository hygiene.
+**Scope:** Current tracked tree, model implementation, tests, analysis scripts, dependencies, documentation consistency, dataset provenance, CI, and repository hygiene.
 
 ## Executive result
 
-The repository has a coherent small-project structure, and the submitted earlier local outputs verified the prior implementation's 13 tests and demo. A static code review found several edge cases worth fixing. The user subsequently ran the verification gate after pulling the audit fixes: all 16 unit tests passed, the GaussianNB comparison printed PASS, and the EDA, distribution, evaluation, and Bayesian updating scripts all completed. The Step 8 feature-contribution changes were added after that run and are not covered by this result.
+Step 8 has passed the user's local verification: 20 unit tests passed, the feature-contribution demo completed, and the contribution sum reconstructed the posterior log-odds. GitHub Actions also passed for the Step 8 commit.
 
-## Issues found and changes committed
+Step 9 has now been added and pushed. It introduces bootstrap intervals, a hypothetical decision-cost threshold sweep, mixed-type feature-dependence diagnostics, a QDA comparison, and four helper tests. **Step 9 is not yet verified locally.** The latest CI run must also be checked before treating the step as complete.
 
-1. **Categorical smoothing for unseen category codes did not form a normalized categorical distribution.** Known-category probabilities used a denominator based only on observed categories, while the unseen-category fallback also received positive probability. The denominator now includes one shared `OTHER` bucket. A new test checks that known categories plus `OTHER` sum to one per class.
-2. **Non-finite smoothing hyperparameters were accepted.** Comparisons such as `NaN <= 0` are false, so `alpha=NaN` or infinite values could get past the old guards and later produce invalid probabilities. `alpha` and `variance_smoothing` must now be finite, and their sign constraints are checked.
-3. **Non-integer and boolean feature indices were not rejected at construction.** These could fail later during NumPy indexing with a less useful error. The constructor now rejects them explicitly.
-4. **A continuous feature could have no observed training values in one class.** The old code would leave that class's Gaussian mean as NaN and skip that feature only for that class during prediction, causing class scores to use inconsistent evidence. Fitting now rejects that case.
-5. **A failed refit could leave a model marked as fitted after partially replacing internal state.** The fitted flag is now cleared at the start of `fit`; a regression test checks that prediction is rejected after a failed refit.
-6. **Documentation drift:** the old README repeated stage notes with contradictory stale verification statements. It has been reorganized into one current guide. Step 6 metrics and Step 7 trace are explicitly marked as historical because the smoothing change can alter their output.
-7. **Distribution diagnostics could silently convert a missing target into class 0.** The Step 3 script previously mapped `num > 0` before checking target missingness, which can turn a missing comparison into `False`. It now rejects missing labels and target values outside the documented 0–4 range before deriving the binary target. It also rejects entirely missing predictor columns and empty per-class continuous groups instead of failing later at plotting/statistics calls.
+## Previously identified defects and fixes
 
-## Static review findings
+1. **Categorical smoothing for unseen categories:** the denominator now includes a shared OTHER bucket so probabilities over known categories plus OTHER sum to one.
+2. **Non-finite hyperparameters:** alpha and variance_smoothing must be finite and satisfy their sign constraints.
+3. **Feature-index validation:** non-integer and boolean indices are rejected explicitly.
+4. **Missing continuous values by class:** fitting rejects a continuous feature with no observed training values in either class rather than silently omitting class-specific evidence.
+5. **Failed refit state:** the fitted flag is cleared before refitting, so a failed refit does not leave a partially updated model marked usable.
+6. **Missing/invalid target in distribution diagnostics:** target values are validated before binary conversion; fully missing columns and empty class groups are rejected.
+7. **Documentation drift:** README and stage reports now distinguish confirmed results from pending verification and state the project's non-clinical scope.
 
-- The GitHub tree was retrieved with `truncated: false`; the tracked project contains the classifier, five analysis/demo scripts plus the distribution-diagnostic script, one unit-test module, dataset, requirements, CI workflow, and stage reports.
-- The post-audit user run showed 16 tests passing and the sequential demo completing. Step 8 added new code and four tests after that run; its expanded test suite and new demo still require local verification.
-- The continuous-only GaussianNB comparison is a separate implementation check. It should be rerun after the current changes even though the Gaussian likelihood formula was not changed.
-- The evaluation script uses a fixed stratified 75/25 split and fits the model on training rows only. Its previously reported metrics are no longer current after the categorical smoothing change.
-- The distribution diagnostics are exploratory and do not automatically select a likelihood distribution for the classifier.
-- The README now distinguishes the UCI dataset license from the project's own source-code license.
+## Step 8 verification record
 
-## Repository hygiene and remaining gaps
+The user ran the 20-test suite and feature-contribution demo successfully. The demo used the fixed stratified split (227 training rows, 76 held-out rows), reconstructed total log-odds of -1.645294, and returned P(class 1) = 0.161746 for held-out row 256. The predicted class 0 matched that row's retrospective label. The GitHub Actions run for commit f19b051 also completed successfully.
 
-- `.gitignore` covers Python caches, local virtual environments, editor/OS files, and generated analysis/evaluation outputs.
-- `requirements.txt` specifies minimum versions, not a fully locked environment. Clean installs may resolve newer dependency versions over time.
-- A GitHub Actions workflow now runs the unit suite, GaussianNB comparison, and data/evaluation/demo scripts on pushes and pull requests to `main`. The workflow has been committed, but the Actions API currently shows no workflow runs; verify its first run before treating CI as operational.
-- No `LICENSE` file declares reuse permissions for BayesPulse's own source code. The dataset license does not automatically license the project's code. Choose a project-code license deliberately before inviting reuse.
-- No Streamlit app exists yet, although Streamlit is listed as a dependency for the planned future app.
-- A fresh-clone run has not been performed. The user verified the post-audit source in their existing local checkout; a clean-environment reproduction is still outstanding.
+## Step 9 implementation review
 
-## Required local verification gate
+- `scripts/uncertainty_decision_analysis.py` uses the same fixed stratified split and fits both models and QDA preprocessing on training rows only.
+- Bootstrap intervals resample held-out prediction indices within each observed class. They are conditional on the held-out partition, not a full retraining or external-validation interval.
+- False-negative and false-positive costs are explicit illustrative constants (5 and 1). They must not be represented as medically appropriate costs.
+- Continuous dependence is summarized with absolute Spearman correlation; categorical dependence with Cramér's V; feature-target dependence with mutual information estimated on training rows.
+- QDA uses training-fitted imputation, one-hot encoding for categorical predictors, and covariance regularization. It is a comparator with different assumptions, not a claim that QDA is superior.
+- Four tests were added for bootstrap interval determinism/validity, missing-class rejection, and Cramér's V edge cases.
+- The GitHub Actions workflow now runs the Step 9 script. The new 24-test suite and full script output still require local verification.
 
-After pulling the latest `main`, run these commands from the repository root in order:
+## Remaining repository gaps
+
+- `requirements.txt` specifies minimum versions rather than a fully locked environment; dependency resolution may change across clean installs.
+- No `LICENSE` file declares reuse permissions for BayesPulse source code. The UCI dataset license does not automatically license this project's code.
+- No Streamlit app exists yet, although Streamlit remains listed in requirements for planned future work.
+- A fresh-clone installation and full verification have not been confirmed by the user.
+- The latest workflow run for the Step 9 changes must be checked; the prior Step 8 success does not certify later commits.
+
+## Required verification gate for Step 9
+
+From the repository root, after pulling latest main:
 
 ```powershell
 git pull origin main
@@ -49,16 +55,11 @@ python scripts/fit_distributions.py
 python scripts/evaluate_model.py
 python scripts/bayesian_updating_demo.py
 python scripts/feature_contributions_demo.py
+python scripts/uncertainty_decision_analysis.py
 ```
 
-The post-audit suite was confirmed at **16 passing tests**. Step 8 adds four tests, so the current expected count is 20. After pulling the latest `main`, check that:
-- all tests pass;
-- GaussianNB comparison prints `PASS`;
-- the evaluation script finishes and writes the report/plots;
-- the demo finishes and its final posterior sums to 1;
-- Step 6 metrics and the Step 7 trace match the latest user-confirmed reports;
-- Step 8's log-odds contributions reconstruct the model posterior odds.
+Expected test count: **24**. Check that all tests pass, the GaussianNB comparison prints PASS, all scripts finish, the new report is written, QDA returns finite probabilities/metrics, and the bootstrap intervals are finite and ordered. Review any warnings rather than suppressing them blindly.
 
 ## Current conclusion
 
-The repository health fixes have passed local verification. Step 8 feature-contribution code is now committed but awaiting its own test/demo run. A remote source review cannot certify every runtime path; the new verification gate remains the acceptance criterion for Step 8.
+The Step 8 implementation and verification are complete. Step 9 is implemented but remains pending user-run verification. The next action is to inspect the full local output and latest GitHub Actions result, fix any defects found, and only then close Step 9.
