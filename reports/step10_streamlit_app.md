@@ -49,7 +49,7 @@ Then verify the UI manually:
 
 ## Verification status
 
-**Pending user verification.** The source file, CI syntax check, and integration smoke test have been pushed, but the updated suite and app have not yet been confirmed locally or in a browser. Do not mark Step 10 complete until the user runs the syntax check, launches Streamlit, and reports whether the UI behaves as expected. The latest GitHub Actions run should also be checked.
+**Verified locally on 2026-10-28.** The user pulled `0e4538f`, ran `python -m py_compile app.py` successfully, and ran `python -m unittest discover -s tests -v`: all **25 tests passed** in 0.445 seconds with no failures or errors. `streamlit run app.py` started and served the app at `http://localhost:8501`; the user reported that the UI looked fine. Streamlit emitted two non-fatal deprecation warnings for `use_container_width`, recommending `width="stretch"` when the current value is `True`. These warnings did not prevent launch or test success. The latest GitHub Actions run status has not been independently confirmed in this audit.
 
 ## Safety and interpretation limits
 
