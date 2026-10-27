@@ -24,3 +24,10 @@ reports/evaluation/step9_uncertainty_decision_analysis.md
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Node / Vite frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
