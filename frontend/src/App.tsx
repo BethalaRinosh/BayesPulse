@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, Beaker, Check, ChevronDown,
+  Activity, ArrowDownRight, ArrowUpRight, Beaker, ChevronDown,
   CircleHelp, FlaskConical, HeartPulse, Info, LoaderCircle, RotateCcw,
   ShieldCheck, Sparkles, Waves,
 } from "lucide-react";
