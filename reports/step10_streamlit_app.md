@@ -26,7 +26,8 @@ The model is trained on the full 303-record dataset for this interactive demonst
 - Updated README with setup, launch instructions, current Step 9 results, and the Step 10 status.
 - Added a generated Step 9 analysis report to `.gitignore`.
 - Updated GitHub Actions to run `python -m py_compile app.py` before the existing tests and analysis scripts.
-- Added this report to document the interface and its verification gate.
+- Added `tests/test_streamlit_app.py` to smoke-test dataset loading, model predictions, feature evidence, and posterior reconstruction. The expected test count is now 25.
+- Fixed the app to use the estimator's actual `feature_log_likelihood_ratios` result key.
 
 ## Commands
 
@@ -48,7 +49,7 @@ Then verify the UI manually:
 
 ## Verification status
 
-**Pending user verification.** The source file and CI syntax check have been pushed, but the app has not yet been confirmed running in a browser. Do not mark Step 10 complete until the user runs the syntax check, launches Streamlit, and reports whether the UI behaves as expected. The latest GitHub Actions run should also be checked.
+**Pending user verification.** The source file, CI syntax check, and integration smoke test have been pushed, but the updated suite and app have not yet been confirmed locally or in a browser. Do not mark Step 10 complete until the user runs the syntax check, launches Streamlit, and reports whether the UI behaves as expected. The latest GitHub Actions run should also be checked.
 
 ## Safety and interpretation limits
 
