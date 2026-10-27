@@ -24,7 +24,7 @@ No unrelated project files were deleted. There is no app, trained model artifact
 - Repository tree retrieved successfully and reported `truncated: false`.
 - Dataset text inspected: 304 lines including the header, 13 predictor columns plus `num`, and `?` missing-value markers are present.
 - Classifier and tests fetched back from GitHub after creation.
-- A local logic-level smoke test passed for empirical priors, separated synthetic classes, normalized finite posterior probabilities, all-feature-missing prior fallback, unseen-category smoothing, constant continuous features, and invalid overlapping feature indices.
+- A local logic-level smoke test passed for empirical priors, separated synthetic classes, normalized finite posterior probabilities, all-feature-missing prior fallback, unseen-category smoothing, constant continuous features, and invalid overlapping feature indices. A targeted check also confirmed numeric NaN target detection.
 - A clean clone and the exact repository test command could not be executed because this environment cannot resolve `github.com` for a direct clone. Therefore the smoke test is useful but is **not** a substitute for running the committed unit-test file in the user's local checkout.
 
 ## Issues found and fixed
