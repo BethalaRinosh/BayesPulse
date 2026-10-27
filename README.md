@@ -1,87 +1,91 @@
 # BayesPulse
-## Medical Risk Prediction Using Probabilistic Feature Modelling
 
-BayesPulse is an educational micro-project for Probability and Statistics for AI & ML. It will explore probabilistic feature modelling and a transparent Naive Bayes implementation for a binary heart-disease classification task.
+**Medical Risk Prediction Using Probabilistic Feature Modelling**
 
-> **Educational disclaimer:** BayesPulse is a student project. Its output is not a medical diagnosis, treatment recommendation, or clinically validated estimate of an individual's health risk.
+BayesPulse is an educational Probability & Statistics project that implements a transparent hybrid Naive Bayes classifier for a binary classification task using the Cleveland subset of the UCI Heart Disease dataset.
 
-## Project status
+> **Important:** This is a student research project, not a medical device. Its output is not a diagnosis, treatment recommendation, or clinically validated estimate of an individual's health risk.
 
-- **Current stage:** Step 7 complete — the user ran all 13 unit tests successfully and verified the sequential Bayesian updating demo. Step 5 numerical validation and Step 6 held-out evaluation also passed in the user's environment.
-- **Dataset selected:** UCI Heart Disease, Cleveland subset.
-- **Implementation status:** Dataset EDA, distribution diagnostics, and a from-scratch hybrid Naive Bayes classifier are present. The classifier uses Gaussian likelihoods for continuous features and Laplace-smoothed categorical likelihoods for discrete-coded features.
-- **Repository audit:** The repository was empty when inspected. The README, dataset, EDA script, and Step 2 report now establish the project baseline; no existing project files were overwritten or removed.
+## Current status
 
-## Planned approach
+- The from-scratch NumPy classifier, dataset diagnostics, reference comparison, held-out evaluation, and sequential Bayesian updating demo are implemented.
+- A repository health audit identified edge cases in input validation and categorical smoothing. Fixes and additional tests have been committed.
+- **Revalidation is pending.** The previous 13-test result and Step 6/Step 7 numbers were produced before these audit fixes. Run the commands below and review the new output before treating those results as current.
+- There is no Streamlit app or automated CI workflow yet. The repository currently has no declared license for the project source code; the dataset's license does not automatically license the code.
 
-1. Acquire and document the UCI Cleveland heart-disease dataset and target definition.
-2. Explore data quality, class balance, feature types, and summary statistics.
-3. Fit and diagnose per-class feature distributions. Assess Gaussian assumptions with histograms, Q-Q plots, and Shapiro-Wilk tests where appropriate; consider log-normal or KDE alternatives when justified. Use Bernoulli/categorical probabilities with Laplace smoothing for discrete features.
-4. Implement Naive Bayes from scratch in NumPy using class priors, Gaussian continuous-feature likelihoods, Laplace-smoothed categorical likelihoods, and normalized log-space posteriors. (Implemented; see `bayespulse/naive_bayes.py`.)
-5. Validate the implementation against scikit-learn's GaussianNB where assumptions align, then audit code and dependencies. (Verified: 11 unit tests pass; priors and predictions match; maximum parameter difference 2.842e-13 and maximum held-out probability difference 3.109e-15.)
-6. Evaluate on a proper held-out split using confusion matrix, precision, recall, F1, ROC-AUC, Brier score, and a calibration curve. (Verified on one 76-row held-out split; results in `reports/step6_evaluation.md`.)
-7. Add a feature-by-feature Bayesian updating demonstration. (Implemented and verified: all 13 unit tests pass; the demo completed on a held-out sample. See `reports/step7_bayesian_updating.md`.)
-8. Add interpretable per-feature log-likelihood ratios.
-9. Add bootstrap uncertainty intervals, cost-sensitive thresholds, and feature-dependence/model comparison analysis where feasible.
-10. Build a Streamlit demo with input validation, risk estimates, contribution breakdowns, distribution context, and a visible disclaimer.
-11. Run end-to-end checks and prepare reproducible setup instructions and viva notes.
+## What it does
 
-The project will be implemented one step at a time. Core probability calculations, distribution fitting logic, and Bayesian updating will be written in readable, commented code rather than copied from an existing implementation.
+- Estimates empirical class priors from training labels.
+- Models continuous predictors with class-conditional Gaussian likelihoods.
+- Models discrete-coded predictors with Laplace-smoothed categorical likelihoods.
+- Handles missing predictors by skipping their likelihood contribution rather than silently converting missing values to zero.
+- Normalizes posterior calculations in log space.
+- Exposes feature-by-feature posterior updates for an educational demonstration.
+- Compares the continuous-only implementation with scikit-learn's `GaussianNB`.
+- Evaluates a fixed stratified held-out split and produces metrics, calibration data, and diagnostic plots.
 
-## Dataset
+## Dataset and target
 
-**UCI Machine Learning Repository: Heart Disease**  
-https://archive.ics.uci.edu/dataset/45/heart+disease
+- **Source:** [UCI Machine Learning Repository: Heart Disease](https://archive.ics.uci.edu/dataset/45/heart+disease)
+- **Local file:** `data/cleveland.csv`
+- **Rows / columns:** 303 records, 13 predictors, and original target `num`
+- **Binary target:** `0` when `num == 0`; `1` when `num > 0`
+- **Missing predictors:** four missing `ca` values and two missing `thal` values in the checked dataset.
+- **Dataset license:** CC BY 4.0, as documented by UCI. Retain dataset attribution.
 
-The UCI listing describes 303 Cleveland instances and 13 commonly used predictors. The original target `num` has values 0–4; this project plans to define the binary target as 0 = no recorded heart disease and 1 = recorded heart disease (original values 1–4). The selected file is `data/cleveland.csv`. The target mapping, missing-value counts, class counts, descriptive statistics, feature-type plan, and limitations are recorded in `reports/step2_dataset_eda.md`.
+This is a small historical dataset. It does not represent all current populations, and the target is recorded disease status in the dataset, not future individual risk.
 
-Dataset license: **CC BY 4.0**. Attribution will be retained in the project documentation.
+## Repository layout
 
-## Sources & Credits
+```text
+BayesPulse/
+├── bayespulse/
+│   └── naive_bayes.py               # NumPy-only hybrid Naive Bayes estimator
+├── data/
+│   └── cleveland.csv                # Cleveland subset
+├── reports/
+│   ├── step2_dataset_eda.md
+│   ├── step4_model.md
+│   ├── step4_repo_audit.md
+│   ├── step5_validation.md
+│   ├── step5_repo_audit.md
+│   ├── step6_evaluation.md
+│   ├── step7_bayesian_updating.md
+│   └── repository_health_audit.md
+├── scripts/
+│   ├── explore_dataset.py
+│   ├── fit_distributions.py
+│   ├── validate_against_sklearn.py
+│   ├── evaluate_model.py
+│   └── bayesian_updating_demo.py
+├── tests/
+│   └── test_naive_bayes.py
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
 
-These are planned reference sources for the implementation. No third-party project code has been copied into this repository at Step 1.
+## Setup
 
-| Source | Planned use | License / attribution notes |
-|---|---|---|
-| UCI Heart Disease dataset — https://archive.ics.uci.edu/dataset/45/heart+disease | Canonical dataset source and documentation | CC BY 4.0; cite the UCI dataset and its creators. |
-| Data Professor public mirror — https://github.com/dataprofessor/data/blob/master/heart-disease-cleveland.csv | Temporary retrieval fallback when the UCI file endpoint could not be fetched directly; only dataset values were used | The mirror's separate license was not relied upon; attribution and license are taken from the original UCI dataset. No code was copied. |
-| SciPy Shapiro documentation — https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.shapiro.html | Reference for normality-test behavior | Official SciPy documentation; SciPy is distributed under a modified BSD license. We call the library API, not copy implementation code. |
-| SciPy probability plot documentation — https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.probplot.html | Reference for normal Q-Q plots | Official SciPy API documentation; no example code copied. |
-| pandas KDE documentation — https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.kde.html | Reference for kernel density estimation and bandwidth interpretation | Documentation reference only; the script calls SciPy's `gaussian_kde` API. |
-| scikit-learn Naive Bayes guide — https://scikit-learn.org/stable/modules/naive_bayes.html | Independent sanity-check reference for GaussianNB and Naive Bayes assumptions | scikit-learn is BSD-3-Clause licensed. Used as documentation/reference only; the core model will be our own NumPy implementation. |
-| scikit-learn calibration guide — https://scikit-learn.org/stable/modules/calibration.html | Understand and validate reliability diagrams | scikit-learn is BSD-3-Clause licensed. Prefer library APIs for evaluation plumbing rather than copying example code. |
-| Streamlit app tutorial — https://docs.streamlit.io/get-started/tutorials/create-an-app | Reference for basic app layout and interaction | Official documentation; use the documented API, not copied tutorial source. |
-| NumPy license — https://github.com/numpy/numpy/blob/main/LICENSE.txt | Reference for numerical-computing dependency | BSD-3-Clause; dependencies retain their own licenses. |
-| Matplotlib license — https://matplotlib.org/stable/project/license.html | Reference for plotting dependency | PSF/BSD-compatible licensing as described by the project. |
+Recommended: Python 3.10 or newer in a virtual environment.
 
-### Reviewed existing implementation
+```powershell
+git clone https://github.com/BethalaRinosh/BayesPulse.git
+cd BayesPulse
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
 
-- Example repository: https://github.com/MastersAbh/Heart-Disease-Prediction-using-Naive-Bayes-Classifier
-- Its README describes a from-scratch Naive Bayes implementation and a comparison with scikit-learn GaussianNB.
-- A LICENSE file was not found at the repository's root during this review, so its reuse permissions are **unclear**. **No code from this repository will be copied.** It may only serve as a high-level topic reference unless a compatible license is confirmed.
+If PowerShell blocks activation, use the Python executable directly at `.venv\Scripts\python.exe` or follow your local Python environment policy.
 
-## Dataset exploration (Step 2)
+## Verification and run commands
 
-- Dataset: 303 rows, 13 predictors, and the original `num` target.
-- Original target counts: 0=164, 1=55, 2=36, 3=35, 4=13. Binary mapping (`num > 0`): class 0=164 and class 1=139.
-- Missing predictors: `ca` has 4 missing values; `thal` has 2. The target has no missing values. The data file preserves `?` markers.
-- EDA command: `python scripts/explore_dataset.py`. It writes descriptive CSVs and histograms under `reports/eda/` when run locally.
-- Measured statistics and handling decisions are documented in `reports/step2_dataset_eda.md`.
+Run these from the repository root after pulling the latest `main`:
 
-## Step 3: distribution diagnostics
-
-Install the relevant packages with `pip install numpy pandas scipy matplotlib`, then run `python scripts/fit_distributions.py`. Shapiro-Wilk p-values are evidence about normality, not automatic distribution selectors. The script is exploratory and has not yet been executed end-to-end in this environment; it does not claim measured diagnostic outputs until you run it. See `reports/step2_dataset_eda.md` for interpretation, missing-value handling, and sources.
-
-## Environment
-
-Python with NumPy, pandas, SciPy, matplotlib, scikit-learn (validation and evaluation only), and Streamlit. Install the declared minimum versions with `pip install -r requirements.txt`. These are minimum-version ranges, not a fully locked reproducible environment.
-
-## Run instructions
-
-From the repository root:
-
-```bash
-pip install -r requirements.txt
+```powershell
+git pull origin main
 python -m unittest discover -s tests -v
 python scripts/explore_dataset.py
 python scripts/fit_distributions.py
@@ -90,47 +94,51 @@ python scripts/evaluate_model.py
 python scripts/bayesian_updating_demo.py
 ```
 
-The model can be imported with `from bayespulse.naive_bayes import HybridNaiveBayes`. It accepts a numeric 2D NumPy array; represent missing feature values as `numpy.nan`, and pass continuous and categorical column indices explicitly. Fit all model parameters on training data only. The Step 4 unit tests cover priors, posterior normalization, separated synthetic classes, missing features, unseen categories, constant features, invalid inputs, single-class/missing-label rejection, and prediction-before-fit. The user reran the suite after the fix: all 11 tests passed. The GaussianNB comparison also passed: class priors and held-out predictions matched; maximum fitted mean/variance difference was 2.842e-13 and maximum held-out probability difference was 3.109e-15.
+The current test suite is expected to contain **16 tests after the audit changes**, but that expectation is not a passing result. Record the actual output. The evaluation and Bayesian demo outputs must be refreshed because the categorical smoothing logic changed.
 
-## Decisions and open questions
+### What the scripts generate
 
-- Dataset choice confirmed: UCI Heart Disease, Cleveland subset.
-- Existing repository files: none were present at inspection time. Step 2 added `data/cleveland.csv`, `scripts/explore_dataset.py`, and the dataset audit. Step 3 added `scripts/fit_distributions.py` and the distribution-diagnostic notes.
-- The initial classifier uses Gaussian likelihoods for continuous features. Step 3 diagnostics are exploratory and have not been run end-to-end here; distribution alternatives are not automatically selected. No clinical validity or predictive performance claim is made.
+- `explore_dataset.py`: summary CSVs and exploratory plots in `reports/eda/`.
+- `fit_distributions.py`: per-class distribution diagnostics and categorical likelihood tables in `reports/distribution_fitting/`.
+- `validate_against_sklearn.py`: checks continuous-only parameter, prior, probability, and prediction equivalence with `GaussianNB`.
+- `evaluate_model.py`: held-out metrics, calibration table, and ROC/confusion-matrix/calibration plots in `reports/evaluation/`.
+- `bayesian_updating_demo.py`: a deterministic held-out sample's posterior after each feature is incorporated.
 
+Generated diagnostic outputs are ignored by Git and can be recreated by rerunning the scripts.
 
-## Step 4: from-scratch classifier
+## Using the estimator
 
-- Core implementation: `bayespulse/naive_bayes.py`, using NumPy only for model calculations. It estimates empirical class priors, Gaussian likelihood parameters for designated continuous columns, and Laplace-smoothed categorical probabilities for designated category-code columns.
-- Posterior calculations are performed in log space and normalized with a stable log-sum-exp calculation. A variance floor guards against zero-variance features. Missing feature values are skipped per feature, while missing labels, infinities, invalid feature indices, and malformed shapes are rejected.
-- Unit tests: `tests/test_naive_bayes.py`. Run `python -m unittest discover -s tests -v`.
-- **Verification note:** the files have been statically reviewed; tests have not been run against a clean clone in this environment. Do not describe the tests as passing until the command has been run and its output checked.
+```python
+import numpy as np
+from bayespulse.naive_bayes import HybridNaiveBayes
 
+# X is a numeric 2D NumPy array; use np.nan for missing predictor values.
+model = HybridNaiveBayes(
+    continuous_features=(0, 1),
+    categorical_features=(2, 3),
+)
+model.fit(X_train, y_train)
+probabilities = model.predict_proba(X_test)
+predictions = model.predict(X_test)
+```
 
-## Step 4 repository health audit
+The feature indices are examples only. Supply the correct indices for your dataset and decide deliberately which variables are continuous versus categorical. Fit preprocessing and model parameters on training data only.
 
-The file inventory, known issues, fixes, and remaining verification limits are recorded in [`reports/step4_repo_audit.md`](reports/step4_repo_audit.md). A local logic-level smoke test passed for core synthetic cases, but the committed test suite and data scripts have not been executed in a clean clone because direct GitHub cloning is unavailable in this environment. Run the commands in the audit report locally before treating the project as runtime-verified.
+## Model assumptions and limitations
 
+- Naive Bayes assumes features are conditionally independent given the class; real-world predictors may be correlated.
+- Continuous features are currently modelled with Gaussian likelihoods regardless of exploratory diagnostics. The diagnostic script does not automatically select a better distribution.
+- An unseen categorical code is mapped to a shared smoothed `OTHER` bucket.
+- Missing continuous observations must be available in both classes during fitting; otherwise the model rejects the training data rather than silently using different feature evidence for different classes.
+- The current evaluation is a single split of a small dataset. Metrics and calibration bins can vary substantially with the split.
+- No clinical validation, external validation, clinical threshold selection, or deployment safety evaluation has been performed.
 
-## Step 5: implementation validation
+## References and licensing
 
-The user-provided output confirms dependency installation was already satisfied and both EDA/distribution scripts completed. It also exposed the prediction-before-fit bug described above. The fix is committed. The GaussianNB comparison harness is available at [`scripts/validate_against_sklearn.py`](scripts/validate_against_sklearn.py); run it alongside the unit suite after pulling the latest `main`. Step 5 was verified by the user's local run: all 11 unit tests passed, and the continuous-only implementation matched GaussianNB within tolerance. See [`reports/step5_validation.md`](reports/step5_validation.md) and [`reports/step4_repo_audit.md`](reports/step4_repo_audit.md).
+- [UCI Heart Disease dataset](https://archive.ics.uci.edu/dataset/45/heart+disease)
+- [scikit-learn Naive Bayes documentation](https://scikit-learn.org/stable/modules/naive_bayes.html)
+- [scikit-learn calibration guide](https://scikit-learn.org/stable/modules/calibration.html)
+- [SciPy Shapiro-Wilk documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.shapiro.html)
+- [SciPy probability plot documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.probplot.html)
 
-
-## Step 5 repository audit
-
-The complete file inventory, dependency review, user-run results, prediction-before-fit fix, `.gitignore` hygiene change, and outstanding verification gate are recorded in [`reports/step5_repo_audit.md`](reports/step5_repo_audit.md). Step 5 is complete based on user-provided local output. The numerical comparison matched within tolerance. Step 6's held-out evaluation implementation and protocol are recorded in [`reports/step6_evaluation.md`](reports/step6_evaluation.md); its runtime results remain pending.
-
-
-## Step 6: held-out evaluation
-
-Run `python scripts/evaluate_model.py` from the repository root. It evaluates all 13 predictors on a stratified 75/25 split (seed 42), fits only on training rows, and reports accuracy, class-1 precision/recall/F1, ROC-AUC, Brier score, a confusion matrix, and calibration bins. It writes a Markdown result report and three plots under `reports/evaluation/`; generated outputs are ignored by Git. Runtime metrics are not claimed until the script is run locally and reviewed. See [`reports/step6_evaluation.md`](reports/step6_evaluation.md).
-
-
-## Step 6: held-out evaluation results
-
-The user ran the 11-test suite successfully and executed `scripts/evaluate_model.py` on a stratified 75/25 split (227 training rows, 76 held-out rows, seed 42). The held-out results were accuracy 0.8816, class-1 precision 0.8250, recall 0.9429, F1 0.8800, ROC-AUC 0.9742, and Brier score 0.0798. The confusion matrix was `[[34, 7], [2, 33]]`. These are preliminary single-split results, not clinical validation; the calibration bins suggest possible overconfidence in a high-probability range. Full details and caveats are in [`reports/step6_evaluation.md`](reports/step6_evaluation.md).
-
-## Step 7: sequential Bayesian updating
-
-`HybridNaiveBayes.predict_proba_progression(X)` returns posterior probabilities starting with class priors and updating after each feature. Run `python scripts/bayesian_updating_demo.py` to trace one deterministic held-out sample. **Verified in the user's environment:** all 13 unit tests passed, and the demo completed. For the displayed held-out row (dataset index 256), the posterior ended at P(class 0) = 0.836706 and P(class 1) = 0.163294; the retrospective label was 0. This is one illustrative sample, not evidence of clinical validity. See [`reports/step7_bayesian_updating.md`](reports/step7_bayesian_updating.md).
+The dataset is attributed to UCI and its listed creators. **Project source-code licensing has not yet been selected.** Add a license file only after deciding what reuse permissions you want to grant.
