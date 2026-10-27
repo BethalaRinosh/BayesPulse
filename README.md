@@ -7,9 +7,9 @@ BayesPulse is an educational micro-project for Probability and Statistics for AI
 
 ## Project status
 
-- **Current stage:** Step 2 complete — dataset acquisition and exploratory analysis.
+- **Current stage:** Step 3 complete — per-class distribution diagnostics and categorical likelihood estimation.
 - **Dataset selected:** UCI Heart Disease, Cleveland subset.
-- **Implementation status:** Cleveland dataset and descriptive EDA script added. No predictive model code has been written yet.
+- **Implementation status:** Dataset EDA and per-class distribution diagnostic scripts added. The final predictive classifier has not been implemented yet.
 - **Repository audit:** The repository was empty when inspected. The README, dataset, EDA script, and Step 2 report now establish the project baseline; no existing project files were overwritten or removed.
 
 ## Planned approach
@@ -44,7 +44,7 @@ These are planned reference sources for the implementation. No third-party proje
 | Source | Planned use | License / attribution notes |
 |---|---|---|
 | UCI Heart Disease dataset — https://archive.ics.uci.edu/dataset/45/heart+disease | Canonical dataset source and documentation | CC BY 4.0; cite the UCI dataset and its creators. |\n| Data Professor public mirror — https://github.com/dataprofessor/data/blob/master/heart-disease-cleveland.csv | Temporary retrieval fallback when the UCI file endpoint could not be fetched directly; only dataset values were used | The mirror's separate license was not relied upon; attribution and license are taken from the original UCI dataset. No code was copied. |
-| SciPy Shapiro documentation — https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.shapiro.html | Reference for normality-test behavior | Official SciPy documentation; SciPy is distributed under a modified BSD license. We will call the library API, not copy implementation code. |
+| SciPy Shapiro documentation — https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.shapiro.html | Reference for normality-test behavior | Official SciPy documentation; SciPy is distributed under a modified BSD license. We call the library API, not copy implementation code. |\n| SciPy probability plot documentation — https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.probplot.html | Reference for normal Q-Q plots | Official SciPy API documentation; no example code copied. |\n| pandas KDE documentation — https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.kde.html | Reference for kernel density estimation and bandwidth interpretation | Documentation reference only; the script calls SciPy's `gaussian_kde` API. |
 | scikit-learn Naive Bayes guide — https://scikit-learn.org/stable/modules/naive_bayes.html | Independent sanity-check reference for GaussianNB and Naive Bayes assumptions | scikit-learn is BSD-3-Clause licensed. Used as documentation/reference only; the core model will be our own NumPy implementation. |
 | scikit-learn calibration guide — https://scikit-learn.org/stable/modules/calibration.html | Understand and validate reliability diagrams | scikit-learn is BSD-3-Clause licensed. Prefer library APIs for evaluation plumbing rather than copying example code. |
 | Streamlit app tutorial — https://docs.streamlit.io/get-started/tutorials/create-an-app | Reference for basic app layout and interaction | Official documentation; use the documented API, not copied tutorial source. |
@@ -57,7 +57,7 @@ These are planned reference sources for the implementation. No third-party proje
 - Its README describes a from-scratch Naive Bayes implementation and a comparison with scikit-learn GaussianNB.
 - A LICENSE file was not found at the repository's root during this review, so its reuse permissions are **unclear**. **No code from this repository will be copied.** It may only serve as a high-level topic reference unless a compatible license is confirmed.
 
-## Dataset exploration (Step 2)\n\n- Dataset: 303 rows, 13 predictors, and the original `num` target.\n- Original target counts: 0=164, 1=55, 2=36, 3=35, 4=13. Binary mapping (`num > 0`): class 0=164 and class 1=139.\n- Missing predictors: `ca` has 4 missing values; `thal` has 2. The target has no missing values. The data file preserves `?` markers.\n- EDA command: `python scripts/explore_dataset.py`. It writes descriptive CSVs and histograms under `reports/eda/` when run locally.\n- Measured statistics and handling decisions are documented in `reports/step2_dataset_eda.md`.\n\n## Planned environment
+## Dataset exploration (Step 2)\n\n- Dataset: 303 rows, 13 predictors, and the original `num` target.\n- Original target counts: 0=164, 1=55, 2=36, 3=35, 4=13. Binary mapping (`num > 0`): class 0=164 and class 1=139.\n- Missing predictors: `ca` has 4 missing values; `thal` has 2. The target has no missing values. The data file preserves `?` markers.\n- EDA command: `python scripts/explore_dataset.py`. It writes descriptive CSVs and histograms under `reports/eda/` when run locally.\n- Measured statistics and handling decisions are documented in `reports/step2_dataset_eda.md`.\n\n## Step 3: distribution diagnostics\n\nInstall the relevant packages with `pip install numpy pandas scipy matplotlib`, then run `python scripts/fit_distributions.py`. Shapiro-Wilk p-values are evidence about normality, not automatic distribution selectors. The script is exploratory and has not yet been executed end-to-end in this environment; it does not claim measured diagnostic outputs until you run it. See `reports/step2_dataset_eda.md` for interpretation, missing-value handling, and sources.\n\n## Planned environment
 
 Python with NumPy, pandas, SciPy, matplotlib, scikit-learn (validation and evaluation only), and Streamlit. The exact dependency pins and installation instructions will be added after the implementation environment is tested.
 
@@ -68,5 +68,5 @@ There is no predictive model or Streamlit application yet. For Step 2 exploratio
 ## Decisions and open questions
 
 - Dataset choice confirmed: UCI Heart Disease, Cleveland subset.
-- Existing repository files: none were present at inspection time; Step 2 added `data/cleveland.csv`, `scripts/explore_dataset.py`, and `reports/step2_dataset_eda.md`.
+- Existing repository files: none were present at inspection time. Step 2 added `data/cleveland.csv`, `scripts/explore_dataset.py`, and the dataset audit. Step 3 added `scripts/fit_distributions.py` and the distribution-diagnostic notes.
 - No model architecture, distribution choice, evaluation result, or performance metric has been claimed as implemented or measured yet.
