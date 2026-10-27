@@ -113,3 +113,8 @@ The file inventory, known issues, fixes, and remaining verification limits are r
 ## Step 5: implementation validation
 
 The user-provided output confirms dependency installation was already satisfied and both EDA/distribution scripts completed. It also exposed the prediction-before-fit bug described above. The fix is committed. The GaussianNB comparison harness is available at [`scripts/validate_against_sklearn.py`](scripts/validate_against_sklearn.py); run it alongside the unit suite after pulling the latest `main`. Step 5's actual comparison values and post-fix test status remain pending. See [`reports/step5_validation.md`](reports/step5_validation.md) and [`reports/step4_repo_audit.md`](reports/step4_repo_audit.md).
+
+
+## Step 5 repository audit
+
+The complete file inventory, dependency review, user-run results, prediction-before-fit fix, `.gitignore` hygiene change, and outstanding verification gate are recorded in [`reports/step5_repo_audit.md`](reports/step5_repo_audit.md). **Before Step 6, pull the latest `main`, rerun the unit suite, and run `python scripts/validate_against_sklearn.py`.** Numerical comparison results are not yet available, so no equivalence claim is made.
