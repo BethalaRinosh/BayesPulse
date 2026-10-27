@@ -27,6 +27,59 @@ class TestHybridNaiveBayes(unittest.TestCase):
         predicted = self.model.predict(np.array([[1.0, 0.0], [5.0, 1.0]]))
         np.testing.assert_array_equal(predicted, np.array([0, 1]))
 
+    def test_log_odds_contributions_reconstruct_posterior(self):
+        samples = np.array([[1.0, 0.0], [5.0, 1.0], [np.nan, np.nan]])
+        explanation = self.model.explain_log_odds(samples)
+        contributions = explanation["feature_log_likelihood_ratios"]
+        total_log_odds = explanation["total_log_odds"]
+        self.assertEqual(contributions.shape, (3, 2))
+        np.testing.assert_allclose(
+            total_log_odds,
+            explanation["prior_log_odds"] + contributions.sum(axis=1),
+        )
+        expected_log_odds = (
+            np.log(self.model.predict_proba(samples)[:, 1])
+            - np.log(self.model.predict_proba(samples)[:, 0])
+        )
+        np.testing.assert_allclose(total_log_odds, expected_log_odds, atol=1e-12)
+
+    def test_missing_features_have_zero_log_likelihood_contribution(self):
+        explanation = self.model.explain_log_odds(np.array([[np.nan, 0.0]]))
+        contributions = explanation["feature_log_likelihood_ratios"]
+        self.assertEqual(contributions[0, 0], 0.0)
+
+        all_missing = self.model.explain_log_odds(np.array([[np.nan, np.nan]]))
+        np.testing.assert_allclose(
+            all_missing["feature_log_likelihood_ratios"], [[0.0, 0.0]]
+        )
+        np.testing.assert_allclose(
+            all_missing["total_log_odds"], [all_missing["prior_log_odds"]]
+        )
+
+    def test_log_odds_explanation_can_reverse_positive_class(self):
+        samples = np.array([[1.0, 0.0], [5.0, 1.0]])
+        default = self.model.explain_log_odds(samples)
+        reversed_explanation = self.model.explain_log_odds(samples, positive_class=0)
+        np.testing.assert_allclose(
+            reversed_explanation["feature_log_likelihood_ratios"],
+            -default["feature_log_likelihood_ratios"],
+        )
+        np.testing.assert_allclose(
+            reversed_explanation["total_log_odds"], -default["total_log_odds"]
+        )
+
+    def test_log_odds_explanation_rejects_invalid_class_configuration(self):
+        with self.assertRaisesRegex(RuntimeError, "Call fit before explain_log_odds"):
+            HybridNaiveBayes((0,), (1,)).explain_log_odds(self.X)
+        with self.assertRaisesRegex(ValueError, "not a fitted class"):
+            self.model.explain_log_odds(self.X, positive_class=9)
+        three_class_model = HybridNaiveBayes((0,), (1,)).fit(
+            np.array([[1.0, 0.0], [3.0, 1.0], [5.0, 0.0]]),
+            np.array([0, 1, 2]),
+        )
+        with self.assertRaisesRegex(ValueError, "exactly two classes"):
+            three_class_model.explain_log_odds(np.array([[2.0, 0.0]]))
+
     def test_posterior_progression_ends_at_predict_proba(self):
         samples = np.array([[1.0, 0.0], [5.0, 1.0], [np.nan, np.nan]])
         progression = self.model.predict_proba_progression(samples)
