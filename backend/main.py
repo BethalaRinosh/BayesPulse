@@ -84,13 +84,52 @@ app.add_middleware(
 )
 
 
+class FeatureValues(BaseModel):
+    """Explicit predictor schema so OpenAPI documents real BayesPulse fields."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "example": {
+                "age": 55,
+                "trestbps": 130,
+                "chol": 240,
+                "thalach": 150,
+                "oldpeak": 1.2,
+                "sex": 1,
+                "cp": 2,
+                "fbs": 0,
+                "restecg": 1,
+                "exang": 0,
+                "slope": 2,
+                "ca": 0,
+                "thal": 3,
+            }
+        },
+    )
+
+    age: float | None = Field(default=None, description=FEATURE_HELP["age"])
+    trestbps: float | None = Field(default=None, description=FEATURE_HELP["trestbps"])
+    chol: float | None = Field(default=None, description=FEATURE_HELP["chol"])
+    thalach: float | None = Field(default=None, description=FEATURE_HELP["thalach"])
+    oldpeak: float | None = Field(default=None, description=FEATURE_HELP["oldpeak"])
+    sex: float | None = Field(default=None, description=FEATURE_HELP["sex"])
+    cp: float | None = Field(default=None, description=FEATURE_HELP["cp"])
+    fbs: float | None = Field(default=None, description=FEATURE_HELP["fbs"])
+    restecg: float | None = Field(default=None, description=FEATURE_HELP["restecg"])
+    exang: float | None = Field(default=None, description=FEATURE_HELP["exang"])
+    slope: float | None = Field(default=None, description=FEATURE_HELP["slope"])
+    ca: float | None = Field(default=None, description=FEATURE_HELP["ca"])
+    thal: float | None = Field(default=None, description=FEATURE_HELP["thal"])
+
+
 class PredictionRequest(BaseModel):
-    """Feature values keyed by the canonical dataset feature names."""
+    """Request wrapper for a prediction."""
 
     model_config = ConfigDict(extra="forbid")
-    features: dict[str, float | None] = Field(
-        default_factory=dict,
-        description="Known numeric feature values. Omitted or null features are treated as missing.",
+    features: FeatureValues = Field(
+        default_factory=FeatureValues,
+        description="Predictor values. Omitted or null features are treated as missing.",
     )
 
 
@@ -155,13 +194,10 @@ def metadata() -> dict[str, Any]:
 
 @app.post("/api/v1/predict")
 def predict(request: PredictionRequest) -> dict[str, Any]:
-    unknown = sorted(set(request.features) - set(FEATURES))
-    if unknown:
-        raise HTTPException(status_code=422, detail=f"Unknown feature name(s): {', '.join(unknown)}")
-
+    supplied_features = request.features.model_dump(exclude_unset=True)
     row_values: list[float] = []
     for name in FEATURES:
-        value = request.features.get(name)
+        value = supplied_features.get(name)
         if value is None:
             row_values.append(float("nan"))
             continue
