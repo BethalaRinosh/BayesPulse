@@ -73,7 +73,8 @@ BayesPulse/
 │   └── uncertainty_decision_analysis.py
 ├── tests/
 │   ├── test_naive_bayes.py
-│   └── test_step9_analysis.py
+│   ├── test_step9_analysis.py
+│   └── test_streamlit_app.py
 ├── requirements.txt
 ├── .gitignore
 └── README.md
