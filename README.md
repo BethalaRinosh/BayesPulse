@@ -63,7 +63,7 @@ Python with NumPy, pandas, SciPy, matplotlib, scikit-learn (validation and evalu
 
 ## Run instructions
 
-There is no predictive model or Streamlit application yet. For Step 2 exploration, run `python scripts/explore_dataset.py` from the repository root after installing pandas and matplotlib. The script has not been executed in GitHub's remote environment; generated plots are created locally when you run it.
+There is no predictive model or Streamlit application yet. For Step 2 exploration, run `python scripts/explore_dataset.py` from the repository root after installing pandas and matplotlib. Static review caught and corrected the CSV header handling before finalization. The script has not been executed in GitHub's remote environment; generated plots are created locally when you run it.
 
 ## Decisions and open questions
 
