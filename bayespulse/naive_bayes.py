@@ -180,6 +180,8 @@ class HybridNaiveBayes:
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predict the class with the largest posterior probability."""
+        if not self._fitted:
+            raise RuntimeError("Call fit before predict.")
         return self.classes_[np.argmax(self.predict_log_proba(X), axis=1)]
 
 
