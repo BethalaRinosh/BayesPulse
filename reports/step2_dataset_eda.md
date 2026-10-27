@@ -6,7 +6,7 @@
 - **Dataset citation:** Janosi, A., Steinbrunn, W., Pfisterer, M., & Detrano, R. (1989). *Heart Disease*. UCI Machine Learning Repository. https://doi.org/10.24432/C52P4X
 - **License:** CC BY 4.0, as stated by UCI.
 - **File:** `data/cleveland.csv`. The original target column `num` is retained with values 0–4. Missing values are represented by `?`.
-- **Retrieval note:** The UCI-hosted file endpoint was not directly retrievable in this session. The values were retrieved from a public mirror that identifies UCI as the source, then retained with UCI attribution. The official UCI page remains the canonical provenance source.
+- **Retrieval note:** The UCI-hosted file endpoint was not directly retrievable in this session. The values were retrieved from the Data Professor public mirror (https://github.com/dataprofessor/data/blob/master/heart-disease-cleveland.csv), which identifies UCI as the source, then retained with UCI attribution. The mirror's separate license was not relied upon; the original UCI dataset's stated CC BY 4.0 license is the provenance basis. The official UCI page remains the canonical source.
 
 ## Dataset structure
 
