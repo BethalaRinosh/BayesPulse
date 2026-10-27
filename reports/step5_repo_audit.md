@@ -14,7 +14,7 @@ Verified the GitHub tree after Step 5 updates. GitHub reported `truncated: false
 | `scripts/fit_distributions.py` | Step 3 distribution diagnostics | User's run completed and wrote diagnostics |
 | `scripts/validate_against_sklearn.py` | Step 5 continuous Gaussian reference comparison | User confirmed numerical parity within tolerance |
 | `bayespulse/naive_bayes.py` | From-scratch hybrid classifier | Fixed prediction-before-fit guard |
-| `tests/test_naive_bayes.py` | Classifier unit tests | Assertion strengthened; rerun pending |
+| `tests/test_naive_bayes.py` | Classifier unit tests | All 11 tests pass in user's local run |
 | `reports/step2_dataset_eda.md` | Dataset and Step 3 audit | Preserved |
 | `reports/step4_model.md` | Model design | Present |
 | `reports/step4_repo_audit.md` | Step 4 audit and follow-up | Updated with actual user output |
@@ -31,7 +31,7 @@ The supplied terminal log establishes that:
 - `pip install -r requirements.txt` completed with all declared requirements already satisfied in Python 3.11.
 - `scripts/explore_dataset.py` completed successfully. It printed shape `(303, 15)` because it adds the derived `has_disease` column to the 14-column source, and reported 164 class-0 and 139 class-1 records.
 - `scripts/fit_distributions.py` completed successfully and printed per-class diagnostics for five continuous features plus 46 categorical likelihood rows.
-- The original unit suite ran 9 tests and had one error in prediction-before-fit handling.
+- The original 9-test run exposed the prediction-before-fit error; after the fix, the user reran the expanded 11-test suite and all tests passed.
 
 The 303-row and class-count output is consistent with the documented source data. The 15-column EDA output is expected after adding `has_disease`, not a dataset schema bug.
 
@@ -39,7 +39,7 @@ The 303-row and class-count output is consistent with the documented source data
 
 Before the fix, `predict()` evaluated `self.classes_` before calling `predict_log_proba()`, so a fresh estimator raised `AttributeError` rather than a deliberate fitted-state error. `predict()` now checks `self._fitted` first and raises `RuntimeError("Call fit before predict.")`. The unit test now asserts this message.
 
-The fix has been fetched back from GitHub and verified in the current source. However, the user's original log predates this change. A new test run is required to establish the fix works in their local checkout.
+The fix was rerun locally by the user: all 11 unit tests passed, including prediction-before-fit handling.
 
 ## Dependency audit
 
