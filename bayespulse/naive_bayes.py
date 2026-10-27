@@ -22,10 +22,11 @@ class HybridNaiveBayes:
     categorical_features:
         Column indices treated as category codes, not continuous quantities.
     alpha:
-        Laplace smoothing strength for categorical likelihoods. Must be > 0.
+        Finite, positive Laplace smoothing strength for categorical likelihoods.
     variance_smoothing:
         Relative floor added to continuous-feature variances to avoid division
-        by zero for constant or nearly constant training features.
+        by zero for constant or nearly constant training features. Must be finite
+        and non-negative.
     """
 
     def __init__(
