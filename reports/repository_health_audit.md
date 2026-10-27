@@ -20,7 +20,7 @@ The repository has a coherent small-project structure, and the submitted earlier
 
 ## Static review findings
 
-- The GitHub tree was retrieved with `truncated: false`; the tracked project contains the classifier, four analysis/demo scripts plus the distribution script, one unit-test module, dataset, requirements, and stage reports.
+- The GitHub tree was retrieved with `truncated: false`; the tracked project contains the classifier, five analysis/demo scripts plus the distribution-diagnostic script, one unit-test module, dataset, requirements, CI workflow, and stage reports.
 - The post-audit user run showed 16 tests passing and the sequential demo completing. Step 8 added new code and four tests after that run; its expanded test suite and new demo still require local verification.
 - The continuous-only GaussianNB comparison is a separate implementation check. It should be rerun after the current changes even though the Gaussian likelihood formula was not changed.
 - The evaluation script uses a fixed stratified 75/25 split and fits the model on training rows only. Its previously reported metrics are no longer current after the categorical smoothing change.
@@ -48,6 +48,7 @@ python scripts/explore_dataset.py
 python scripts/fit_distributions.py
 python scripts/evaluate_model.py
 python scripts/bayesian_updating_demo.py
+python scripts/feature_contributions_demo.py
 ```
 
 The post-audit suite was confirmed at **16 passing tests**. Step 8 adds four tests, so the current expected count is 20. After pulling the latest `main`, check that:
