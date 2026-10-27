@@ -25,7 +25,7 @@ CATEGORICAL = ["sex", "cp", "fbs", "restecg", "exang", "slope", "ca", "thal"]
 def main() -> None:
     """Load the data, audit it, and generate descriptive summaries and plots."""
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    df = pd.read_csv(DATA_PATH, names=COLUMNS, na_values=["?"])
+    df = pd.read_csv(DATA_PATH, header=0, na_values=["?"])
 
     if df.shape != (303, 14):
         raise ValueError(f"Expected 303 rows and 14 columns; found {df.shape}.")
