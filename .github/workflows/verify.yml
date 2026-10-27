@@ -1,0 +1,47 @@
+name: BayesPulse checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Validate Gaussian implementation against scikit-learn
+        run: python scripts/validate_against_sklearn.py
+
+      - name: Run dataset exploration
+        run: python scripts/explore_dataset.py
+
+      - name: Run distribution diagnostics
+        run: python scripts/fit_distributions.py
+
+      - name: Evaluate held-out model
+        run: python scripts/evaluate_model.py
+
+      - name: Run Bayesian updating demo
+        run: python scripts/bayesian_updating_demo.py
