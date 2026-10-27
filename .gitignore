@@ -18,6 +18,7 @@ reports/distribution_fitting/*.png
 # Generated held-out evaluation outputs (reproducible from scripts)
 reports/evaluation/*.png
 reports/evaluation/step6_evaluation_results.md
+reports/evaluation/step9_uncertainty_decision_analysis.md
 
 # Editor / OS files
 .DS_Store
