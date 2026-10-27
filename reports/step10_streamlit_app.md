@@ -49,7 +49,7 @@ Then verify the UI manually:
 
 ## Verification status
 
-**Original-environment verification passed on 2026-10-28.** The user ran `python -m py_compile app.py`, all **25 tests passed**, Streamlit started at `http://localhost:8501`, and the user reported that the UI looked fine. Streamlit emitted non-fatal deprecation warnings for `use_container_width`. A subsequent fresh-clone test with newer dependencies passed 24 tests but errored in `tests/test_streamlit_app.py`: the test attempted to mutate a read-only NumPy array. The test setup now calls `.copy()` on the constructed row before assigning categorical modes. Fresh-clone verification after this fix is still pending. This is a test-setup compatibility issue, not evidence of a failure in the classifier itself.
+**Verification passed on 2026-10-28.** In the original environment, `python -m py_compile app.py` passed, all **25 tests passed**, Streamlit started at `http://localhost:8501`, and the user reported that the UI looked fine. A clean clone with newer dependencies initially exposed a read-only NumPy array in test setup. The row now calls `.copy()` before categorical-mode assignment. After pulling the fix, the user reran `python -m py_compile app.py` and `python -m unittest discover -s tests -v`: **all 25 tests passed in 0.553 seconds**. Streamlit cache/script-context warnings in bare test mode were non-fatal. This is now verified in both the original environment and a fresh clone.
 
 ## Safety and interpretation limits
 
