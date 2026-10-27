@@ -250,6 +250,101 @@ class HybridNaiveBayes:
 
         return np.stack(snapshots, axis=1)
 
+    def explain_log_odds(
+        self, X: np.ndarray, positive_class: object | None = None
+    ) -> dict[str, object]:
+        """Decompose binary posterior log-odds into prior and feature evidence.
+
+        Each feature contribution is:
+            log P(x_j | positive class) - log P(x_j | negative class)
+
+        Positive contributions increase the model's odds for the selected
+        positive class; negative contributions decrease them. Missing features
+        contribute zero. This is model-level evidence, not a causal explanation.
+        """
+        if not self._fitted:
+            raise RuntimeError("Call fit before explain_log_odds.")
+        if len(self.classes_) != 2:
+            raise ValueError("Log-odds explanations require exactly two classes.")
+
+        X = self._as_matrix(X)
+        if X.shape[1] != self.n_features_in_:
+            raise ValueError(
+                f"X has {X.shape[1]} features; model was fitted with {self.n_features_in_}."
+            )
+
+        if positive_class is None:
+            positive_position = 1
+        else:
+            matches = np.flatnonzero(self.classes_ == positive_class)
+            if matches.size != 1:
+                raise ValueError(f"positive_class {positive_class!r} is not a fitted class.")
+            positive_position = int(matches[0])
+        negative_position = 1 - positive_position
+
+        prior_log_odds = float(
+            self.class_log_prior_[positive_position]
+            - self.class_log_prior_[negative_position]
+        )
+        ordered_features = self.continuous_features + self.categorical_features
+        contributions = np.zeros((X.shape[0], len(ordered_features)), dtype=float)
+
+        for feature_position, feature_index in enumerate(ordered_features):
+            values = X[:, feature_index]
+            observed_mask = np.isfinite(values)
+            if not observed_mask.any():
+                continue
+
+            if feature_index in self.continuous_features:
+                positive_means, positive_variances = self.gaussian_params_[positive_position]
+                negative_means, negative_variances = self.gaussian_params_[negative_position]
+                positive_mean = positive_means[feature_index]
+                negative_mean = negative_means[feature_index]
+                positive_variance = positive_variances[feature_index]
+                negative_variance = negative_variances[feature_index]
+                observed_values = values[observed_mask]
+
+                positive_log_pdf = -0.5 * (
+                    np.log(2.0 * np.pi * positive_variance)
+                    + ((observed_values - positive_mean) ** 2 / positive_variance)
+                )
+                negative_log_pdf = -0.5 * (
+                    np.log(2.0 * np.pi * negative_variance)
+                    + ((observed_values - negative_mean) ** 2 / negative_variance)
+                )
+                contributions[observed_mask, feature_position] = (
+                    positive_log_pdf - negative_log_pdf
+                )
+            else:
+                categories = self.category_values_[feature_index]
+                positive_log_probs = self.category_log_probs_[feature_index][positive_position]
+                negative_log_probs = self.category_log_probs_[feature_index][negative_position]
+                positive_unknown = self.category_unknown_log_probs_[feature_index][positive_position]
+                negative_unknown = self.category_unknown_log_probs_[feature_index][negative_position]
+
+                for row_index in np.flatnonzero(observed_mask):
+                    matches = np.flatnonzero(categories == values[row_index])
+                    if matches.size:
+                        category_position = int(matches[0])
+                        positive_log_likelihood = positive_log_probs[category_position]
+                        negative_log_likelihood = negative_log_probs[category_position]
+                    else:
+                        positive_log_likelihood = positive_unknown
+                        negative_log_likelihood = negative_unknown
+                    contributions[row_index, feature_position] = (
+                        positive_log_likelihood - negative_log_likelihood
+                    )
+
+        total_log_odds = prior_log_odds + contributions.sum(axis=1)
+        return {
+            "positive_class": self.classes_[positive_position],
+            "negative_class": self.classes_[negative_position],
+            "feature_indices": ordered_features,
+            "prior_log_odds": prior_log_odds,
+            "feature_log_likelihood_ratios": contributions,
+            "total_log_odds": total_log_odds,
+        }
+
     @staticmethod
     def _normalize_log_scores(joint: np.ndarray) -> np.ndarray:
         """Normalize unnormalized class log scores with log-sum-exp."""
