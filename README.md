@@ -43,7 +43,7 @@ These are planned reference sources for the implementation. No third-party proje
 
 | Source | Planned use | License / attribution notes |
 |---|---|---|
-| UCI Heart Disease dataset — https://archive.ics.uci.edu/dataset/45/heart+disease | Dataset and dataset documentation | CC BY 4.0; cite the UCI dataset and its creators. |
+| UCI Heart Disease dataset — https://archive.ics.uci.edu/dataset/45/heart+disease | Canonical dataset source and documentation | CC BY 4.0; cite the UCI dataset and its creators. |\n| Data Professor public mirror — https://github.com/dataprofessor/data/blob/master/heart-disease-cleveland.csv | Temporary retrieval fallback when the UCI file endpoint could not be fetched directly; only dataset values were used | The mirror's separate license was not relied upon; attribution and license are taken from the original UCI dataset. No code was copied. |
 | SciPy Shapiro documentation — https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.shapiro.html | Reference for normality-test behavior | Official SciPy documentation; SciPy is distributed under a modified BSD license. We will call the library API, not copy implementation code. |
 | scikit-learn Naive Bayes guide — https://scikit-learn.org/stable/modules/naive_bayes.html | Independent sanity-check reference for GaussianNB and Naive Bayes assumptions | scikit-learn is BSD-3-Clause licensed. Used as documentation/reference only; the core model will be our own NumPy implementation. |
 | scikit-learn calibration guide — https://scikit-learn.org/stable/modules/calibration.html | Understand and validate reliability diagrams | scikit-learn is BSD-3-Clause licensed. Prefer library APIs for evaluation plumbing rather than copying example code. |
