@@ -45,3 +45,6 @@ jobs:
 
       - name: Run Bayesian updating demo
         run: python scripts/bayesian_updating_demo.py
+
+      - name: Run feature contribution demo
+        run: python scripts/feature_contributions_demo.py
