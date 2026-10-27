@@ -88,6 +88,9 @@ def main() -> None:
     if not set(df["num"].unique()).issubset({0, 1, 2, 3, 4}):
         raise ValueError("The target column 'num' contains unexpected values.")
     df[TARGET] = (df["num"] > 0).astype(int)
+    entirely_missing = [feature for feature in CONTINUOUS + CATEGORICAL if df[feature].isna().all()]
+    if entirely_missing:
+        raise ValueError(f"Predictor columns are entirely missing: {entirely_missing}")
 
     # Continuous-feature fitting is performed separately within each class.
     fit_rows = []
@@ -99,6 +102,10 @@ def main() -> None:
         ]:
             values = df.loc[df[TARGET] == class_value, feature].dropna().to_numpy(dtype=float)
             n = len(values)
+            if n == 0:
+                raise ValueError(
+                    f"Continuous feature '{feature}' has no observations in class {class_value}."
+                )
             mean = float(np.mean(values))
             sd = float(np.std(values, ddof=1)) if n > 1 else float("nan")
             w_stat, p_value = safe_shapiro(values)
