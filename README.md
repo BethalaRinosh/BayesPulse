@@ -11,7 +11,7 @@ BayesPulse is an educational Probability & Statistics project that implements a 
 - The from-scratch NumPy classifier, dataset diagnostics, reference comparison, held-out evaluation, and sequential Bayesian updating demo are implemented.
 - A repository health audit identified edge cases in input validation and categorical smoothing. Fixes and additional tests have been committed.
 - **Revalidation is pending.** The previous 13-test result and Step 6/Step 7 numbers were produced before these audit fixes. Run the commands below and review the new output before treating those results as current.
-- There is no Streamlit app or automated CI workflow yet. The repository currently has no declared license for the project source code; the dataset's license does not automatically license the code.
+- There is no Streamlit app yet. A GitHub Actions verification workflow has been added, but no workflow run is visible yet. The repository currently has no declared license for the project source code; the dataset's license does not automatically license the code.
 
 ## What it does
 
@@ -39,6 +39,9 @@ This is a small historical dataset. It does not represent all current population
 
 ```text
 BayesPulse/
+├── .github/
+│   └── workflows/
+│       └── verify.yml               # Automated tests and script checks
 ├── bayespulse/
 │   └── naive_bayes.py               # NumPy-only hybrid Naive Bayes estimator
 ├── data/
