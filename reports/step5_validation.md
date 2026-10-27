@@ -48,4 +48,4 @@ The user ran the unit suite from the repository root on Windows: all 11 tests pa
 - Agreement with GaussianNB on continuous features checks that the NumPy Gaussian calculations align with a trusted implementation when assumptions match.
 - It does not validate the hybrid categorical component against GaussianNB, establish that Gaussian likelihoods are the best fit for every feature, or demonstrate clinical utility.
 - Feature distributions and all model parameters must be fitted on training data only for any evaluation.
-- Step 6 now implements a broader hybrid-model held-out evaluation and calibration analysis in `scripts/evaluate_model.py`; see `reports/step6_evaluation.md`. Its local runtime results remain pending.
+- Step 6's earlier local evaluation results are recorded in `reports/step6_evaluation.md`. Those metrics predate the later categorical-smoothing audit fix and must be refreshed for the current implementation. See `reports/repository_health_audit.md`.
