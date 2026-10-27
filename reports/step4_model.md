@@ -8,11 +8,11 @@ Implement a transparent hybrid Naive Bayes classifier using NumPy for the core p
 
 - **Class priors:** empirical class frequencies from the training labels.
 - **Continuous features:** class-conditional Gaussian density with a variance floor to prevent division by zero for constant or nearly constant columns.
-- **Categorical features:** category-code likelihoods with Laplace smoothing, with categories learned from the training matrix. Numeric category codes are treated as labels, not as continuous distances.
+- **Categorical features:** category-code likelihoods with Laplace smoothing, with categories learned from the training matrix. An explicit shared `OTHER` bucket represents unseen codes so probabilities normalize over known categories plus `OTHER`. Numeric category codes are treated as labels, not as continuous distances.
 - **Posterior:** log prior plus observed feature log-likelihoods, normalized using a NumPy log-sum-exp calculation.
 - **Missing predictors:** NaN values are skipped feature-by-feature, both while estimating each feature's parameters and when scoring an observation. They are not replaced with zero. A missing label is rejected.
-- **Unknown categories:** receive the smoothed fallback probability.
-- **Input safeguards:** reject malformed dimensions, mismatched labels, infinities, invalid or overlapping feature indices, non-positive smoothing, and prediction before fitting.
+- **Unknown categories:** map to the shared `OTHER` bucket, whose smoothing mass is included in the categorical denominator.
+- **Input safeguards:** reject malformed dimensions, mismatched labels, infinities, non-integer/out-of-range/overlapping feature indices, non-finite or invalid smoothing parameters, and prediction before fitting. A continuous feature with no observed training values in one class is rejected.
 
 ## Files added
 
@@ -32,7 +32,7 @@ python -m unittest discover -s tests -v
 
 ## Verification status
 
-The implementation and tests have been reviewed statically, but they have **not yet been executed in a clean clone** in this environment. No passing test result is claimed. Run the command above and inspect the output before relying on the implementation. Step 5 is reserved for comparison against scikit-learn GaussianNB and the planned broader validation/audit; it has not been started.
+This section is a historical snapshot from Step 4. Later user-run evidence is recorded in the Step 5–7 reports. The repository health audit introduced additional edge-case guards and tests; the latest suite must be rerun before the current code is considered verified.
 
 ## Limitations and next checks
 
